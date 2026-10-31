@@ -56,6 +56,7 @@ Some issues carry a Mock: an image of the intended UI. Mock tools lack the appli
 - **Only Development and the Simplifier change product code and tests.** Research, Code Review and Validation leave the Workspace as they received it, and the Coordinator changes no code.
 - **Evidence travels with the PR.** Screenshots and Mocks are pushed to the `walkway-evidence` branch and embedded in the PR body, next to the Acceptance Criterion they prove.
 - **Every Task improves the next.** A retrospective names the root cause of each retry, correction cycle and Escalation. Project causes become Lessons in `.walkway/lessons.md` that every later Step follows; causes in the Walkway skills become proposals in this repository's `improvements.md`, for the user to decide.
+- **The flow runs on messages.** Each worker reports to the Coordinator through Orca with `worker_done`, or asks with `ask`; the Coordinator answers, applies the gate and starts the next worker in the same turn. Its state lives in `coordinator.md` and in Orca, and it runs under `/loop`, so a lost turn resumes from that state until the draft PR or an Escalation.
 - **Bounded correction.** After three cycles, or after a Step needs a third run in one cycle, the Coordinator raises an Escalation.
 - **The user merges.** Walkway stops at a draft PR and moves the Linear issue to its review state, with no comment.
 
@@ -102,17 +103,17 @@ Link each skill into your Claude Code skills folder, from the root of this repos
 for skill_dir in "$PWD"/skills/*; do ln -s "$skill_dir" ~/.claude/skills/; done
 ```
 
-The skills are user-invoked: you type only `/walkway`; the Coordinator hands each Step skill to its worker.
+The skills are user-invoked: you type only `/loop /walkway`; the Coordinator hands each Step skill to its worker.
 
 ## Start a Task
 
 Create an Orca Workspace linked to the Linear issue, with a Claude session that starts the Coordinator:
 
 ```bash
-orca worktree create --repo path:"$PWD" --name <ISSUE-ID> --linear-issue <ISSUE-ID> --agent claude --prompt "/walkway"
+orca worktree create --repo path:"$PWD" --name <ISSUE-ID> --linear-issue <ISSUE-ID> --agent claude --surface terminal --prompt "/loop /walkway"
 ```
 
-You can also create the Workspace in the Orca app and type `/walkway` in its Claude session. Talk only to the Coordinator; it relays every Escalation.
+You can also create the Workspace in the Orca app and type `/loop /walkway` in its Claude terminal session. `/loop` wakes the Coordinator again if its turn ends before the draft PR. Talk only to the Coordinator; it relays every Escalation.
 
 ## Start from the Grok Bot
 
@@ -131,13 +132,13 @@ Repositories (Linear team key -> Orca repository):
 3. Run `orca status --json`. When the runtime is not reachable, run `orca open --json` and check again.
 4. Run `orca reference find <ISSUE-ID> --json`. When it lists a Workspace for the issue, report that Workspace and stop.
 5. Start the Coordinator:
-   orca worktree create --repo name:<repository> --name <ISSUE-ID> --linear-issue <ISSUE-ID> --agent claude --surface terminal --prompt "/walkway" --json
+   orca worktree create --repo name:<repository> --name <ISSUE-ID> --linear-issue <ISSUE-ID> --agent claude --surface terminal --prompt "/loop /walkway" --json
    Keep result.launch.outcome.handle from the receipt. When the command reports a lost launch reply, run it again with --retry-launch <operationId> from the error; a fresh create would make a second Workspace.
-6. After about 20 seconds, run `orca terminal read --terminal <handle> --screen`. Claude working on /walkway means the Coordinator runs. An idle Claude prompt means /walkway never arrived: send it once with `orca terminal send --terminal <handle> --text "/walkway" --enter`, then read the screen again.
+6. After about 20 seconds, run `orca terminal read --terminal <handle> --screen`. Claude working on /walkway means the Coordinator runs. An idle Claude prompt means the prompt never arrived: send it once with `orca terminal send --terminal <handle> --text "/loop /walkway" --enter`, then read the screen again.
 7. Move the issue to the team's started state, such as In Progress: list the states with `orca linear team states --team <TEAM> --json`, then run `orca linear status set <ISSUE-ID> --to "<state>" --json`.
 8. Report the issue ID, the Workspace name, the terminal handle and the Linear state.
 
-The issue ID is the only value you pass to Orca, and the prompt is always exactly "/walkway". The Coordinator reads the issue, its comments and its attachments from Linear, and runs the Orca orchestration itself.
+The issue ID is the only value you pass to Orca, and the prompt is always exactly "/loop /walkway". The Coordinator reads the issue, its comments and its attachments from Linear, and runs the Orca orchestration itself.
 ```
 
 Then ask the bot: "Start Walkway for ENG-123".
