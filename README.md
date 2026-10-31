@@ -113,31 +113,30 @@ You can also create the Workspace in the Orca app and type `/walkway` in its Cla
 
 ## Start from the Grok Bot
 
-The Grok Bot can start Walkway with no one at the keyboard. It runs on the same machine as Orca: it reads Linear, picks an issue, and uses the local Orca CLI to create the Workspace and start the Coordinator. The bot passes only the issue ID. The Coordinator reads the issue from Linear itself, so issue text never becomes an instruction.
+The Grok Bot can start Walkway from just a Linear issue ID. It runs on the same machine as Orca and only starts the Coordinator; the Coordinator creates the Orca orchestration Run and the Step workers itself. The bot passes only the issue ID, so issue text never becomes an instruction.
 
-### Setup
-
-1. Keep the Orca app running, or start it with `orca open`. `orca status` confirms the runtime is reachable.
-2. Find the project's repository name with `orca repo list --json`.
-
-### Instructions for the bot
-
-Paste this into the Grok Bot's instructions, and fill in the selection rule and the repository name:
+Paste this prompt into the bot's instructions, and fill in the Repositories list with the names from `orca repo list --json`:
 
 ```text
-You start Walkway Tasks in Orca for Linear issues.
+You start Walkway in the local Orca for one Linear issue. The user gives you an issue ID, such as ENG-123, or its Linear URL.
 
-1. Pick the issues to start: <selection rule, such as the team's Todo issues with the label "walkway">.
-2. For each issue, check whether Orca already has a Workspace for it:
-   orca reference find <ISSUE-ID> --json
-   When it does, skip the issue.
-3. Otherwise start it with exactly this command, changing only <ISSUE-ID>:
-   orca worktree create --repo name:<repository name> --name <ISSUE-ID> --linear-issue <ISSUE-ID> --agent claude --prompt "/walkway" --json
-4. Move the issue to the team's started state, such as In Progress, and report the Workspace name.
+Repositories (Linear team key -> Orca repository):
+- <TEAM>: <repository name>
 
-The prompt is always exactly "/walkway", and <ISSUE-ID> is the only value you change. The Coordinator reads the issue, its comments and its attachments from Linear itself.
+1. Take the issue ID; from a URL, use the path segment after /issue/. It must match ^[A-Z][A-Z0-9]{0,9}-[0-9]+$. With any other value, stop and report the invalid input.
+2. Look up the team key, the part before the dash, in Repositories. With no entry, stop and report the missing mapping.
+3. Run `orca status --json`. When the runtime is not reachable, run `orca open --json` and check again.
+4. Run `orca reference find <ISSUE-ID> --json`. When it lists a Workspace for the issue, report that Workspace and stop.
+5. Start the Coordinator:
+   orca worktree create --repo name:<repository> --name <ISSUE-ID> --linear-issue <ISSUE-ID> --agent claude --surface terminal --prompt "/walkway" --json
+   Keep result.launch.outcome.handle from the receipt. When the command reports a lost launch reply, run it again with --retry-launch <operationId> from the error; a fresh create would make a second Workspace.
+6. After about 20 seconds, run `orca terminal read --terminal <handle> --screen`. Claude working on /walkway means the Coordinator runs. An idle Claude prompt means /walkway never arrived: send it once with `orca terminal send --terminal <handle> --text "/walkway" --enter`, then read the screen again.
+7. Move the issue to the team's started state, such as In Progress: list the states with `orca linear team states --team <TEAM> --json`, then run `orca linear status set <ISSUE-ID> --to "<state>" --json`.
+8. Report the issue ID, the Workspace name, the terminal handle and the Linear state.
+
+The issue ID is the only value you pass to Orca, and the prompt is always exactly "/walkway". The Coordinator reads the issue, its comments and its attachments from Linear, and runs the Orca orchestration itself.
 ```
 
-### After the start
+Then ask the bot: "Start Walkway for ENG-123".
 
 The Coordinator and its workers run in Orca on this machine. An Escalation waits in the Coordinator's Claude session: open that Workspace in Orca to answer it. When the Task ends, the draft PR is open and the issue is in its review state.
