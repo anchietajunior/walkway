@@ -119,13 +119,13 @@ You can also create the Workspace in the Orca app and type `/loop /walkway` in i
 
 The Grok Bot can start Walkway from just a Linear issue ID. It runs on the same machine as Orca and only starts the Coordinator; the Coordinator creates the Orca orchestration Run and the Step workers itself. The bot passes only the issue ID, so issue text never becomes an instruction.
 
-Paste this prompt into the bot's instructions, and fill in the Repositories list with the names from `orca repo list --json`:
+Paste this prompt into the bot's instructions. Repositories maps each Linear team key to its Orca repository, as `orca repo list --json` names it; add one line per team:
 
 ```text
 You start Walkway in the local Orca for one Linear issue. The user gives you an issue ID, such as ENG-123, or its Linear URL.
 
 Repositories (Linear team key -> Orca repository):
-- <TEAM>: <repository name>
+- ENG: platform
 
 1. Take the issue ID; from a URL, use the path segment after /issue/. It must match ^[A-Z][A-Z0-9]{0,9}-[0-9]+$. With any other value, stop and report the invalid input.
 2. Look up the team key, the part before the dash, in Repositories. With no entry, stop and report the missing mapping.
