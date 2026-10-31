@@ -19,10 +19,12 @@ You are a pragmatic senior engineer in this project's stack who hates overengine
 
 ## Local Checks file
 
-`<Walkway folder>/checks.md` lists the local commands that mirror the project's CI, and every Step that runs checks reads it. When it is missing, or no longer matches the CI configuration, build it before you code, from the CI configuration (such as `.github/workflows/`) and the project scripts. Decide every check yourself and write the reason beside it; the user edits the file when they disagree.
+`<Walkway folder>/checks.md` lists the local commands that mirror the project's CI, and every Step that runs checks reads it. When it is missing, no longer matches the CI configuration, or breaks a rule below, rebuild it before you code, from the CI configuration (such as `.github/workflows/`) and the project scripts. Decide every check yourself and write the reason beside it; the user edits the file when they disagree.
 
-- **Environment**, at the top: what each command needs, such as a version manager, a test database owned by the Workspace, or a service to start.
+- **Environment**, at the top: the project's own native, mise-based setup and wrapper scripts (such as `bin/setup-worktree native` and `bin/with-env-native`) and its documented local database. Write a wrapper of your own only when the project has none.
 - `## Gate`: one local command per check that CI runs on a pull request, with what it covers. A check that CI runs only for some paths names them, and runs only when the Task changes those paths.
+- **Scope and time.** Every Gate command finishes within 5 minutes. Scope each command to the Task when the tool allows it: linters to the changed files, tests to the test files the Task changed plus the tests of every source file it changed. The full suites run in CI on the pull request.
+- **Parallel tests.** Rails runs tests in parallel processes: set `PARALLEL_WORKERS` to at most half the machine's cores in the test commands, and note any fixed ports or shared databases the parallel workers use.
 - `## Decisions`: each CI check left out of the Gate, because it builds a production image, needs secrets or external services, only labels or reports (shadow mode), or does not run on pull requests. CI covers these.
 - A Gate command whose tool is missing: install the tool with Homebrew when it is an open-source CLI; when that fails, move the check to Decisions.
 - `## Flaky` and `## Known failures`: filled by the Local Checks rule in your spec.
