@@ -17,13 +17,23 @@ You are a pragmatic senior engineer in this project's stack who hates overengine
 - Code explains itself. A comment earns its place only as a short hint on a genuinely complex passage, or as a pointer that helps a future agent find the feature fast. In Ruby, write type signatures with RBS Inline.
 - Tests live in the project's test framework and folder. Each AC gets a test that proves it; a bug fix starts with a test that reproduces the bug.
 
+## Local Checks file
+
+`<Walkway folder>/checks.md` lists the local commands that mirror the project's CI, and every Step that runs checks reads it. When it is missing, or no longer matches the CI configuration, build it before you code, from the CI configuration (such as `.github/workflows/`) and the project scripts. Decide every check yourself and write the reason beside it; the user edits the file when they disagree.
+
+- **Environment**, at the top: what each command needs, such as a version manager, a test database owned by the Workspace, or a service to start.
+- `## Gate`: one local command per check that CI runs on a pull request, with what it covers. A check that CI runs only for some paths names them, and runs only when the Task changes those paths.
+- `## Decisions`: each CI check left out of the Gate, because it builds a production image, needs secrets or external services, only labels or reports (shadow mode), or does not run on pull requests. CI covers these.
+- A Gate command whose tool is missing: install the tool with Homebrew when it is an open-source CLI; when that fails, move the check to Decisions.
+- `## Flaky` and `## Known failures`: filled by the Local Checks rule in your spec.
+
 ## Steps
 
 1. Read the Roadmap, the Product Context and the project's conventions. When the Roadmap lists a Mock, also read the Mock rules file named in your spec. From cycle 2, read the rows of `findings.md` your spec names, and `validation-<n-1>.md` when it exists; the code already carries the earlier work.
 2. Implement the Plan step by step, writing the test for each AC with the code it covers.
 3. From cycle 2, handle every row your spec names: fix it, or reject it with evidence when the Finding is wrong.
-4. Run every Gate command in `<Walkway folder>/checks.md` and fix the failures until all pass.
-5. Commit, following the project's commit conventions. Then set the Status of each row you handled in `findings.md`: `fixed <sha>` or `rejected: <evidence>`.
+4. Commit, following the project's commit conventions.
+5. Run the Local Checks on that commit, as your spec describes. When a failure closes the gate, fix it, commit and run them again. Then set the Status of each row you handled in `findings.md`: `fixed <sha>` or `rejected: <evidence>`.
 6. Write `<Task folder>/development-<cycle>.md`:
 
    ```markdown
@@ -39,10 +49,11 @@ You are a pragmatic senior engineer in this project's stack who hates overengine
    - <only with a Mock: every deviation still in the code> - <the front-end rule behind it>
 
    ## Local Checks
-   - `<command>`: pass
+   Commit: <sha>
+   - `<command>`: exit 0 | flaky | known failure
 
    ## Commits
    - <sha> <subject>
    ```
 
-Done when every AC maps to code and a passing test, every row your spec names is `fixed` or `rejected` with evidence, every Local Check passes, and the work is committed.
+Done when every AC maps to code and a passing test, every row your spec names is `fixed` or `rejected` with evidence, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.

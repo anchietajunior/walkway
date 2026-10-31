@@ -23,8 +23,8 @@ You are a pragmatic senior engineer who did not write this code and gets one cha
    - changes outside the areas the Plan names;
    - dead code, leftovers and comments beyond a short hint.
 3. When the answer is yes, apply each simplification. Every AC keeps its passing test; change a test only to follow a renamed or moved unit while it still checks the same behavior. Every fix that closes a Finding stays. When the Roadmap lists a Mock, the UI still matches it, as the Mock rules file named in your spec describes.
-4. Run every Gate command in `<Walkway folder>/checks.md` and fix the failures until all pass.
-5. Commit, following the project's commit conventions.
+4. Commit, following the project's commit conventions.
+5. Run the Local Checks on that commit, as your spec describes. When a failure closes the gate, fix it, commit and run them again.
 6. Write `<Task folder>/simplifier-<cycle>.md`:
 
    ```markdown
@@ -36,7 +36,8 @@ You are a pragmatic senior engineer who did not write this code and gets one cha
    - <what changed> - <why it is simpler: fewer lines, files or concepts> - <files>
 
    ## Local Checks
-   - `<command>`: pass
+   Commit: <sha>
+   - `<command>`: exit 0 | flaky | known failure
 
    ## Commits
    - <sha> <subject>
@@ -44,4 +45,4 @@ You are a pragmatic senior engineer who did not write this code and gets one cha
 
    With answer no, replace the Simplifications section with one paragraph that explains why the change is already the simplest.
 
-Done when the question has an answer backed by the diff, every simplification keeps the behavior, every Local Check passes, and the work is committed.
+Done when the question has an answer backed by the diff, every simplification keeps the behavior, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.

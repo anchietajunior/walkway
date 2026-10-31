@@ -1,6 +1,6 @@
 # Walkway
 
-Walkway is a collection of Claude Code skills that delivers one Linear issue through five Steps. Each Step has one responsibility, one expected outcome and one persona, and runs in its own Claude Code session. A Coordinator starts each Step as an Orca worker, moves the work between them, fixes its own Findings, and ends with a draft PR that carries the evidence. The user takes part only in strategic decisions.
+Walkway is a collection of Claude Code skills that delivers one Linear issue through five Steps. Each Step has one responsibility, one expected outcome and one persona, and runs in its own Claude Code session. A Coordinator starts each Step as an Orca worker, moves the work between them, fixes its own Findings, and ends with a draft PR that carries the evidence. The Coordinator only coordinates: every build, test and code change runs in a worker. The user takes part only in strategic decisions.
 
 ```text
 Research -> Development -> Simplifier -> Code Review x2 -> Validation -> draft PR
@@ -48,8 +48,8 @@ Some issues carry a Mock: an image of the intended UI. Mock tools lack the appli
 
 ## Principles
 
-- **Tell, don't ask.** Every Step researches the Sources deeply and infers its answers, recording each inference with its evidence. Only an Escalation, a wide-open question that only the user can decide, reaches the user, through the Coordinator, with the options and a recommendation. Code Review and Validation escalate only for a very large ambiguity or risk, and each such Escalation counts as a Research Gap.
-- **Claims are checked, never trusted.** No Step hands off work while the project's tests, linters, type checks or any other CI check fail locally. The Coordinator runs those Local Checks again at every code gate, Code Review proves test coverage with mutation probes, and Validation produces its own evidence.
+- **Tell, don't ask.** Every Step researches the Sources deeply and infers its answers, recording each inference with its evidence. A question with an option the agent would recommend is decided by taking that option and listing it in the final report. Only an Escalation, a question with no safe default that only the user can decide, reaches the user, through the Coordinator, with the options and a recommendation. Code Review and Validation escalate only for a very large ambiguity or risk, and each such Escalation counts as a Research Gap.
+- **Claims are checked, never trusted.** No Step hands off work while the project's tests, linters, type checks or any other CI check fail locally. Development builds `.walkway/checks.md` from the CI configuration on its own. Validation runs every Local Check again on the reviewed commit, Code Review proves test coverage with mutation probes, and Validation produces its own evidence.
 - **Only Development and the Simplifier change product code and tests.** Research, Code Review and Validation leave the Workspace as they received it.
 - **Evidence travels with the PR.** Screenshots and Mocks are pushed to the `walkway-evidence` branch and embedded in the PR body, next to the Acceptance Criterion they prove.
 - **Every Task improves the next.** A retrospective names the root cause of each retry, correction cycle and Escalation. Project causes become Lessons in `.walkway/lessons.md` that every later Step follows; causes in the Walkway skills become proposals in this repository's `improvements.md`, for the user to decide.
@@ -64,7 +64,7 @@ Walkway keeps its files in a `.walkway/` folder at the root of the project's mai
 .walkway/
   product-context.md      How the product works, its customers, the problems it solves
   sources.md              Project Sources that serve every Task
-  checks.md               Gate commands that mirror each CI check, and the checks left out
+  checks.md               Gate commands that mirror each CI check, the checks left out, flaky and known failures
   lessons.md              Rules learned from earlier Tasks
   tasks/<ISSUE-ID>/
     coordinator.md        Run, base commit, Step log and Escalations

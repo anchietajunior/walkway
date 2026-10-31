@@ -29,7 +29,7 @@ Escalate only for a very large ambiguity or risk the Roadmap leaves open, and na
    - Earlier Validation: for every row with Source `validation` whose Status is `fixed` or `rejected`, check the running application and set the Status to `closed` or `reopened: <reason>`.
 
    Add each gap as a row of `findings.md`, in its table format, with Source `validation` and Status `open`. Use the Code Review severities: Critical and Required are blocking.
-5. Run every Gate command in `<Walkway folder>/checks.md` once on this commit.
+5. Run the Local Checks on this commit, as your spec describes. A failure that closes the gate is a blocking Finding.
 6. An AC that cannot be exercised in this environment is a very large risk: raise an Escalation, so the user decides how to prove it.
 7. Write `<Task folder>/validation-<cycle>.md`:
 
@@ -50,7 +50,7 @@ Escalate only for a very large ambiguity or risk the Roadmap leaves open, and na
    - Code Review: <Findings confirmed fixed, or problems the review missed>
 
    ## Local Checks
-   - `<command>`: pass
+   - `<command>`: exit 0 | flaky | known failure
    ```
 
 Done when every AC is proved or failed with fresh evidence on the recorded commit, every Development claim and every `closed` or Validation row of `findings.md` is confronted, and the Workspace is unchanged. PASS requires every AC proved, no blocking row in `findings.md` and every Local Check passing.
