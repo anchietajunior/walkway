@@ -16,7 +16,7 @@ The isolated copy of the project where one Task is delivered. All Steps of that 
 _Avoid_: Worktree, sandbox
 
 **Step**:
-One of the five ordered stages of Walkway: Research, Development, Simplifier, Code Review, Validation. Each Step has one responsibility, one expected outcome and one Persona.
+One of the five ordered stages of Walkway: Research, Development, Simplifier, Code Review, Validation. Each Step has one responsibility, one expected outcome and one Persona, and runs in its own Claude Code session.
 _Avoid_: Phase, stage
 
 **Product Context**:
@@ -58,9 +58,13 @@ _Avoid_: Note, learning, memory
 The project's tests, linters, type checks and every other check its CI runs, executed on the user's machine. No Step hands off work while a Local Check fails.
 _Avoid_: CI, pipeline, quality gate
 
+**Readability rules**:
+The general rules for readable code, valid in any language, that Development writes by, the Simplifier rewrites toward and Code Review judges by. They decide only what the project's own rules leave open.
+_Avoid_: Style guide, coding standards
+
 **Persona**:
 The role the agent takes during a Step, such as an experienced product manager during Research.
 
 **Coordinator**:
-The role that moves a Task through the Steps, checks the outcome of each Step before the next one starts, and sends the work back to Development when Code Review or Validation fails.
+The role that moves a Task through the Steps, checks the outcome of each Step before the next one starts, and sends the work back to Development when Code Review or Validation fails. It never changes the code.
 _Avoid_: Orchestrator

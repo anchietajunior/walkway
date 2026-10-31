@@ -59,4 +59,6 @@ Write `<Task folder>/roadmap.md`:
 - <What this Task does not do.>
 ```
 
+The Roadmap says what the product does and which area of code changes. The names, the data shapes and the structure of the code belong to Development, so no AC, Decision or Plan step prescribes them. Every AC is behavior someone observes in the running application, its emails or its data.
+
 Done when Validation can verify every AC without asking anyone, every AC is covered by at least one Plan step, and every Plan step names its area of code and the ACs it covers.

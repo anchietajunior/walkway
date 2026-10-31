@@ -16,9 +16,9 @@ Escalate only for a very large ambiguity or risk the Roadmap leaves open, and na
 
 ## Steps
 
-1. **Context.** Read the Product Context, the Roadmap, the newest `development-<n>.md`, the newest `simplifier-<n>.md` and `findings.md` when it exists. When the Roadmap lists a Mock, read the Mock rules file named in your spec. Record the commit you review: `git rev-parse HEAD`.
-2. **Run your review skill.** Its findings go into `findings.md`, in place of the skill's own report format.
-   - `code-review`: invoke it with the base commit as the fixed point and `<Task folder>/roadmap.md` as the spec. The Roadmap is the whole spec, even when commit messages name an issue, so the review needs no issue tracker and no tracker setup.
+1. **Context.** Read the Product Context, the Roadmap, the Readability rules file named in your spec, the newest `development-<n>.md`, the newest `simplifier-<n>.md` and `findings.md` when it exists. When the Roadmap lists a Mock, read the Mock rules file named in your spec. Record the commit you review: `git rev-parse HEAD`.
+2. **Run your review skill.** Give it the project's rules and then the Readability rules as standards: where they conflict, the project rule wins. Its findings go into `findings.md`, in place of the skill's own report format.
+   - `code-review`: invoke it with the base commit as the fixed point and `<Task folder>/roadmap.md` as the spec. The Roadmap is the whole spec, even when commit messages name an issue, so the review needs no issue tracker and no tracker setup. The skill asks for parallel sub-agents; run its Standards axis and then its Spec axis yourself, in this session, each with the brief the skill gives.
    - `code-review-and-quality` (`agent-skills:code-review-and-quality` when installed as a plugin): invoke it on `git diff <base commit>...HEAD`, with the Roadmap as the spec.
 3. **Earlier Findings.** For every row your skill raised whose Status is `fixed` or `rejected`, check the code and set the Status to `closed` (fix confirmed, or rejection accepted) or `reopened: <reason>`.
 4. **New Findings.** From cycle 2, a new Required, Optional or Nit Finding points only at lines changed in `git diff <cycle start commit>..HEAD`; a Critical Finding may point anywhere. This keeps approved code approved, so the cycles converge. Add each Finding as a row with the next free ID, this cycle, your skill as Source, a severity, `file:line`, the AC it touches, the problem, a concrete fix, and Status `open`. When a row already describes the same problem in the same place, add your skill to its Source instead. With a Mock, also apply the Code Review check from the Mock rules.
@@ -32,11 +32,11 @@ Done when your skill ran to completion on the recorded commit, each of its Findi
 | Label | Meaning | Blocking |
 | --- | --- | --- |
 | Critical | Security hole, data loss or broken functionality | Yes |
-| Required | AC missing or wrong, missing test, broken project standard, structure made worse | Yes |
+| Required | AC missing or wrong, missing test, broken project rule, broken Readability rule or Words rule, structure made worse | Yes |
 | Optional | A worthwhile improvement | No |
 | Nit | Style | No |
 
-Keep the severity `code-review-and-quality` gives. For a `code-review` Finding, a missing or wrong AC and a broken documented standard are Required; a smell is Optional unless it makes the structure worse.
+A broken project rule, Readability rule or Words rule is always Required: code against a rule the project documents, a method that fails the first read, "people" for customers or users. Where a project rule and a Readability rule conflict, judge by the project rule. Otherwise keep the severity `code-review-and-quality` gives. For a `code-review` Finding, a missing or wrong AC and a broken documented standard are Required; a smell is Optional unless it makes the structure worse.
 
 Every Critical and Required Finding names the remedy: reuse the existing helper, remove the pass-through wrapper, replace the conditional chain with a map. Prefer the remedy that removes moving parts.
 

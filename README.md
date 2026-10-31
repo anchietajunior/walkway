@@ -1,6 +1,6 @@
 # Walkway
 
-Walkway is a collection of Claude Code skills that delivers one Linear issue through five Steps. Each Step has one responsibility, one expected outcome and one persona, and runs in its own Claude Code session. A Coordinator starts each Step as an Orca worker, moves the work between them, fixes its own Findings, and ends with a draft PR that carries the evidence. The Coordinator only coordinates: every build, test and code change runs in a worker, and each worker appears in the Orca Workspace as its own named Claude session, such as `ENG-123 · Development 1`. The user takes part only in strategic decisions.
+Walkway is a collection of Claude Code skills that delivers one Linear issue through five Steps. Each Step has one responsibility, one expected outcome and one persona, and runs in its own Claude Code session. A Coordinator starts each Step as an Orca worker, moves the work between them, and ends with a draft PR that carries the evidence. The Coordinator only coordinates: it never changes code, every build, test and code change runs in a worker, and each worker appears in the Orca Workspace as its own named Claude session, such as `ENG-123 · Development 1`. Development fixes every blocking Finding. The user takes part only in strategic decisions.
 
 ```text
 Research -> Development -> Simplifier -> Code Review x2 -> Validation -> draft PR
@@ -15,8 +15,8 @@ The words used here are defined in [GLOSSARY.md](GLOSSARY.md). The decisions beh
 | Step | Persona | Outcome |
 | --- | --- | --- |
 | 1. Research | Experienced product manager | The Product Context, when missing or outdated, and a Roadmap with numbered Acceptance Criteria |
-| 2. Development | Pragmatic senior engineer who hates overengineering | Readable code and tests that meet every Acceptance Criterion, committed, with green Local Checks |
-| 3. Simplifier | Pragmatic engineer with fresh eyes | The same behavior with fewer changes, or a reasoned "already simplest" |
+| 2. Development | Pragmatic senior engineer who hates overengineering | Code that passes the first read and tests that meet every Acceptance Criterion, committed, with green Local Checks |
+| 3. Simplifier | Pragmatic engineer with fresh eyes | The same behavior with fewer changes and code that reads better, or a reasoned "already simplest" |
 | 4. Code Review | Independent staff engineer | Two review sessions, one per review skill, recording every Finding in one `findings.md` |
 | 5. Validation | Experienced QA engineer | Fresh evidence and screenshots for every Acceptance Criterion in the running application, and a verdict |
 
@@ -28,11 +28,11 @@ Then Research reads the Linear issue, its first Source, and every project Source
 
 ### 2. Development
 
-Development implements the Roadmap with the simplest correct change that follows the project's conventions. It writes organized, readable code so the next agent or human understands it on the first read: clear names, explicit flow, abstractions only for a concrete need, and comments only as short hints on complex code. In Ruby, type signatures use RBS Inline. Every Acceptance Criterion gets a test.
+Development implements the Roadmap with the simplest correct change that follows the project's rules. It writes boring code by the [Readability rules](skills/walkway/readability-rules.md), so the next agent or human understands it on the first read: names in the domain's words, entry points that read as named steps, data with named parts, and abstractions only for a concrete need. The Readability rules hold for any language; rules about a language, a framework or a code style, such as comments or type signatures, come from the project's own rules, which win wherever both cover the same point. The Roadmap never prescribes the shape of the code. Every Acceptance Criterion gets a test.
 
 ### 3. Simplifier
 
-The Simplifier opens a fresh session with the Research context and the Development change, and asks: "If I could redo this implementation in a simpler, more pragmatic way, with fewer changes, without changing the behavior or creating bugs, would I?" When the answer is yes, it lists and applies the simplifications before Code Review. It runs in every cycle, right after Development.
+The Simplifier opens a fresh session with the Research context and the Development change, and asks two questions: "If I could redo this implementation in a simpler, more pragmatic way, with fewer changes, without changing the behavior or creating bugs, would I?" and "Does every changed method pass the first read?" It applies every simplification and rewrites every method that fails the first read before Code Review. It runs in every cycle, right after Development.
 
 ### 4. Code Review
 
@@ -48,9 +48,12 @@ Some issues carry a Mock: an image of the intended UI. Mock tools lack the appli
 
 ## Principles
 
+- **One session per Step.** Orca orchestration starts every Step as its own Claude Code session, in every cycle. No Step and no Coordinator starts subagents: when a skill asks for them, the worker runs each part itself, one after the other.
+- **The project's rules win.** Every Step follows the rules the project documents: `CLAUDE.md` and `AGENTS.md` at every level, `.claude/rules/`, `CONTRIBUTING.md` and the docs they point to. Where one differs from a Walkway skill on the code, tests, docs, commits or how to run the project, the project rule wins; the Walkway flow stays as the skills say.
+- **Domain words.** Everything Walkway writes, from code to the PR body, names customers, users and every other actor by their role, never as "people".
 - **Tell, don't ask.** Every Step researches the Sources deeply and infers its answers, recording each inference with its evidence. A question with an option the agent would recommend is decided by taking that option and listing it in the final report. Only an Escalation, a question with no safe default that only the user can decide, reaches the user, through the Coordinator, with the options and a recommendation. Code Review and Validation escalate only for a very large ambiguity or risk, and each such Escalation counts as a Research Gap.
-- **Claims are checked, never trusted.** No Step hands off work while the project's tests, linters, type checks or any other CI check fail locally. Development builds `.walkway/checks.md` from the CI configuration on its own, with the project's native mise environment, commands scoped to the Task, bounded parallel tests and a 5-minute ceiling per command; a slower command is treated as a hang. The full suites run in CI on the PR. Validation runs every Local Check again on the reviewed commit, Code Review proves test coverage with mutation probes, and Validation produces its own evidence.
-- **Only Development and the Simplifier change product code and tests.** Research, Code Review and Validation leave the Workspace as they received it.
+- **Claims are checked, never trusted.** No Step hands off work while the project's tests, linters, type checks or any other CI check fail locally. Development builds `.walkway/checks.md` from the CI configuration on its own, with the local setup the project documents, commands scoped to the Task, bounded parallel tests and a 5-minute ceiling per command; a slower command is treated as a hang. The full suites run in CI on the PR. Validation runs every Local Check again on the reviewed commit, Code Review proves test coverage with mutation probes, and Validation produces its own evidence.
+- **Only Development and the Simplifier change product code and tests.** Research, Code Review and Validation leave the Workspace as they received it, and the Coordinator changes no code.
 - **Evidence travels with the PR.** Screenshots and Mocks are pushed to the `walkway-evidence` branch and embedded in the PR body, next to the Acceptance Criterion they prove.
 - **Every Task improves the next.** A retrospective names the root cause of each retry, correction cycle and Escalation. Project causes become Lessons in `.walkway/lessons.md` that every later Step follows; causes in the Walkway skills become proposals in this repository's `improvements.md`, for the user to decide.
 - **Bounded correction.** After three cycles, or after a Step needs a third run in one cycle, the Coordinator raises an Escalation.
