@@ -68,7 +68,7 @@ The project's Local Checks live in `<Walkway folder>/checks.md`. Development bui
 
 ## 2. Run the Steps
 
-Cycle 1 runs **Research → Development → Simplifier → Code Review (`code-review`) → Code Review (`code-review-and-quality`) → Validation**. A blocking row in `<Task folder>/findings.md` after both Code Reviews, or a failed Validation, starts a **correction cycle** at once, with no user involvement: **Development → Simplifier → Code Review (`code-review`) → Code Review (`code-review-and-quality`) → Validation**. Both Code Reviews always run, so Development receives every Finding of the cycle at once. A Critical or Required row whose Status is `open` or `reopened` is blocking.
+Cycle 1 runs **Research → Development → Simplifier → Code Review (`ce-code-review`) → Code Review (`code-review-and-quality`) → Validation**. A blocking row in `<Task folder>/findings.md` after both Code Reviews, or a failed Validation, starts a **correction cycle** at once, with no user involvement: **Development → Simplifier → Code Review (`ce-code-review`) → Code Review (`code-review-and-quality`) → Validation**. Both Code Reviews always run, so Development receives every Finding of the cycle at once. A Critical or Required row whose Status is `open` or `reopened` is blocking.
 
 Each arrow starts a new worker: one Claude Code session per Step, per run and per cycle.
 
@@ -81,8 +81,8 @@ After each gate, this table names the next action. The last line of the `coordin
 | Setup | Run created | Research, cycle 1 |
 | Research | Gate passes | Development |
 | Development | Gate passes | Simplifier |
-| Simplifier | Gate passes | Code Review (`code-review`) |
-| Code Review (`code-review`) | Gate passes | Code Review (`code-review-and-quality`) |
+| Simplifier | Gate passes | Code Review (`ce-code-review`) |
+| Code Review (`ce-code-review`) | Gate passes | Code Review (`code-review-and-quality`) |
 | Code Review (`code-review-and-quality`) | Gate passes, no blocking row | Validation |
 | Code Review (`code-review-and-quality`) | Gate passes, a blocking row | Development, next cycle |
 | Validation | Gate passes | Deliver |
@@ -132,7 +132,7 @@ Task folder: <Task folder>
 Base commit: <base commit>
 Cycle: <n>
 Cycle start commit: <HEAD when this cycle's Development started; the base commit in cycle 1>
-<Code Review: Review skill: code-review | code-review-and-quality>
+<Code Review: Review skill: ce-code-review | code-review-and-quality>
 Mock rules: <absolute path to mocks.md, beside this skill>
 Readability rules: <absolute path to readability-rules.md, beside this skill>
 Read first: <the input files of this Step and cycle>

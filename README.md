@@ -15,8 +15,8 @@ The words used here are defined in [GLOSSARY.md](GLOSSARY.md). The decisions beh
 | Step | Persona | Outcome |
 | --- | --- | --- |
 | 1. Research | Experienced product manager | The Product Context, when missing or outdated, and a Roadmap with numbered Acceptance Criteria |
-| 2. Development | Pragmatic senior engineer who hates overengineering | Code that passes the first read and tests that meet every Acceptance Criterion, committed, with green Local Checks |
-| 3. Simplifier | Pragmatic engineer with fresh eyes | The same behavior with fewer changes and code that reads better, or a reasoned "already simplest" |
+| 2. Development | Pragmatic senior engineer who hates overengineering; DHH in Rails code | Code that passes the first read and tests that meet every Acceptance Criterion, committed, with green Local Checks |
+| 3. Simplifier | Pragmatic engineer with fresh eyes; Vladimir Dementyev in Rails code | The same behavior with fewer changes and code that reads better, or a reasoned "already simplest" |
 | 4. Code Review | Independent staff engineer | Two review sessions, one per review skill, recording every Finding in one `findings.md` |
 | 5. Validation | Experienced QA engineer | Fresh evidence and screenshots for every Acceptance Criterion in the running application, and a verdict |
 
@@ -28,15 +28,15 @@ Then Research reads the Linear issue, its first Source, and every project Source
 
 ### 2. Development
 
-Development implements the Roadmap with the simplest correct change that follows the project's rules. It writes boring code by the [Readability rules](skills/walkway/readability-rules.md), so the next agent or human understands it on the first read: names in the domain's words, entry points that read as named steps, data with named parts, and abstractions only for a concrete need. The Readability rules hold for any language; rules about a language, a framework or a code style, such as comments or type signatures, come from the project's own rules, which win wherever both cover the same point. The Roadmap never prescribes the shape of the code. Every Acceptance Criterion gets a test.
+Development implements the Roadmap with the simplest correct change that follows the project's rules. It writes boring code by the [Readability rules](skills/walkway/readability-rules.md), so the next agent or human understands it on the first read: names in the domain's words, entry points that read as named steps, data with named parts, and abstractions only for a concrete need. The Readability rules hold for any language; rules about a language, a framework or a code style, such as comments or type signatures, come from the project's own rules, which win wherever both cover the same point. The Roadmap never prescribes the shape of the code. Every Acceptance Criterion gets a test. In Rails code, Development reasons as DHH: vanilla Rails first, rich models, thin REST controllers and clarity over cleverness, inside the stack the project already uses.
 
 ### 3. Simplifier
 
-The Simplifier opens a fresh session with the Research context and the Development change, and asks two questions: "If I could redo this implementation in a simpler, more pragmatic way, with fewer changes, without changing the behavior or creating bugs, would I?" and "Does every changed method pass the first read?" It applies every simplification and rewrites every method that fails the first read before Code Review. It runs in every cycle, right after Development.
+The Simplifier opens a fresh session with the Research context and the Development change, and asks two questions: "If I could redo this implementation in a simpler, more pragmatic way, with fewer changes, without changing the behavior or creating bugs, would I?" and "Does every changed method pass the first read?" It applies every simplification and rewrites every method that fails the first read before Code Review. It runs in every cycle, right after Development. In Rails code, the Simplifier reasons as Vladimir Dementyev, author of Layered Design for Ruby on Rails Applications: each piece of logic sits in its layer, and a new abstraction stays only when it removes complexity from the change.
 
 ### 4. Code Review
 
-Each cycle runs two Code Review sessions, one after the other, each with one review skill: Matt Pocock's `code-review` (Spec and Standards axes), then Addy Osmani's [`code-review-and-quality`](https://github.com/addyosmani/agent-skills) (tests first with mutation probes, then correctness, readability, architecture, security and performance). Both record their Findings in the Task's `findings.md`, one table labelled Critical, Required, Optional or Nit, with a Status for each row. A Critical or Required row starts a new cycle: Development fixes it and the Simplifier runs again, with no user involvement.
+Each cycle runs two Code Review sessions, one after the other, each with one review skill: Compound Engineering's [`ce-code-review`](https://github.com/EveryInc/compound-engineering-plugin) (reviewer personas for correctness, tests, maintainability and the project's standards, plus security, performance or reliability when the change touches them), then Addy Osmani's [`code-review-and-quality`](https://github.com/addyosmani/agent-skills) (tests first with mutation probes, then correctness, readability, architecture, security and performance). Both record their Findings in the Task's `findings.md`, one table labelled Critical, Required, Optional or Nit, with a Status for each row. A Critical or Required row starts a new cycle: Development fixes it and the Simplifier runs again, with no user involvement.
 
 ### 5. Validation
 
@@ -87,7 +87,13 @@ Walkway keeps its files in a `.walkway/` folder at the root of the project's mai
 - Orca, with the `orchestration` and `orca-linear` skills installed (`orca skills install`) and Linear connected.
 - The GitHub CLI (`gh`), signed in.
 - Claude Code permissions for unattended workers. Workers run in terminals nobody watches and write to the main checkout's `.walkway/` folder, outside their Workspace. A permission prompt there stalls the Task, so allow those edits and the project's commands in your Claude Code settings before the first Task.
-- Matt Pocock's `code-review` skill.
+- The Compound Engineering plugin, for `ce-code-review` and its reviewer personas:
+
+  ```text
+  /plugin marketplace add EveryInc/compound-engineering-plugin
+  /plugin install compound-engineering@compound-engineering-plugin
+  ```
+
 - Addy Osmani's agent skills, installed as a Claude Code plugin so the skill keeps its reference checklists:
 
   ```text
