@@ -51,6 +51,11 @@ Escalate only for a very large ambiguity or risk the Roadmap leaves open, and na
 
    ## Local Checks
    - `<command>`: exit 0 | flaky | known failure
+
+   ## Visual
+   - <screenshot path>: <the changed screen or state it shows>
    ```
 
-Done when every AC is proved or failed with fresh evidence on the recorded commit, every Development claim and every `closed` or Validation row of `findings.md` is confronted, and the Workspace is unchanged. PASS requires every AC proved, no blocking row in `findings.md` and every Local Check passing.
+   `## Visual` feeds the PR's visual section, so it holds only a front-end change: the Task changes the front end when `git diff --name-only <base commit> HEAD` lists views, templates, components, styles or client-side scripts. Then list the screenshots of every screen and state that change affects. Otherwise write only `No UI change.` under it; the screenshots of your other evidence stay in the Task folder.
+
+Done when every AC is proved or failed with fresh evidence on the recorded commit, every Development claim and every `closed` or Validation row of `findings.md` is confronted, `## Visual` lists every changed screen or says `No UI change.`, and the Workspace is unchanged. PASS requires every AC proved, no blocking row in `findings.md` and every Local Check passing.

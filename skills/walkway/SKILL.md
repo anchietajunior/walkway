@@ -188,14 +188,18 @@ Limits:
 When Validation passes:
 
 1. **Sync with the base branch, once per Task.** Fetch it. When `origin/<base branch>` moved past the Task branch's merge base, add a Required row to `findings.md` with Source `sync`: merge `origin/<base branch>` into the Task branch. It starts a correction cycle in which Development merges, resolves any conflict and runs the Local Checks. Set the Base commit in `coordinator.md` to `git merge-base HEAD origin/<base branch>` when that cycle starts, so every later diff holds only the Task's work. After the sync cycle passes, deliver without fetching again.
-2. **Publish the evidence.** Fetch `walkway-evidence`, then add the files under `<Task folder>/evidence/` and `<Task folder>/mocks/` to it, under `<ISSUE-ID>/`, through a temporary git worktree built on `origin/walkway-evidence`, so the Task branch stays free of evidence. Create the branch as an orphan only when the remote has none. Push without force; on a rejected push, fetch, rebase and push again. Link each file as `https://github.com/<owner>/<repo>/blob/walkway-evidence/<path>?raw=true`, which renders in the PR for everyone with access to the repository.
-3. **Open the draft PR.** Push the Task branch with `git push -u origin HEAD`, then run `gh pr create --draft --base <base branch>`, following the repository's PR template when one exists. The Task folder is not versioned, so the PR body stands alone. It follows the Words rule of the worker spec:
-   - the goal and the Linear issue link;
-   - one row per AC: its result, how Validation proved it, and its screenshots inline;
-   - with a Mock, each Mock beside its screenshot, and every Mock deviation with its rule;
-   - the decisions a reviewer needs, including the user's Escalation answers;
-   - the cycles run and the blocking Findings closed, from `findings.md`;
-   - the Gate commands that passed, from the last Validation.
+2. **Publish the screenshots of a front-end change.** When the last `validation-<n>.md` says `No UI change.` under `## Visual`, skip this step. Otherwise fetch `walkway-evidence`, then add the screenshots listed under `## Visual` and the files under `<Task folder>/mocks/` to it, under `<ISSUE-ID>/`, through a temporary git worktree built on `origin/walkway-evidence`, so the Task branch stays free of evidence. Create the branch as an orphan only when the remote has none. Push without force; on a rejected push, fetch, rebase and push again. Link each file as `https://github.com/<owner>/<repo>/blob/walkway-evidence/<path>?raw=true`, which renders in the PR for everyone with access to the repository.
+3. **Open the draft PR.** Push the Task branch with `git push -u origin HEAD`, then run `gh pr create --draft --base <base branch>`. The body is the repository's PR template, its sections in their order and each filled as the template asks, followed by one Walkway section, `## Evidence`. Without a template, use a `Changes` section and a `Visual` section before `## Evidence`. The Task folder is not versioned, so the body stands alone. Write every section short and direct, by the Words rule of the worker spec: one-line bullets, with no tables and no paragraphs.
+   - The changes section: the Linear issue link, what changes for the customer, and each decision a reviewer needs, including the user's Escalation answers.
+   - The visual section, such as `Visual` or `Screenshots`: for a front-end change, the screenshots listed under `## Visual` in the last Validation, each Mock beside its screenshot, and every Mock deviation with its rule. Otherwise only `No UI change.`
+   - `## Evidence`, after the template's sections:
+
+     ```markdown
+     ## Evidence
+     - ✅ AC1 <the criterion in a few words>: <how Validation proved it, in a few words>
+     - Local Checks green on `<short sha>`<; each known failure, with its reason>
+     - Walkway: <n> cycles, <n> blocking Findings fixed
+     ```
 4. **Move the Linear issue** to the team's review state, such as "Review" or "In Review" (list the states with the `orca-linear` skill). The status change is the only Linear update. When the team has no review state, leave the status and say so in your report.
 5. **Retrospective.** Give every retry, correction cycle and Escalation in the log its root cause: Research gap, implementation error, review miss, flaky check, environment, or unclear Walkway instruction. Then improve:
    - Project causes: correct `product-context.md` or `sources.md`, and add one rule per lesson to `<Walkway folder>/lessons.md` as `- <rule> (<ISSUE-ID>)`. A Lesson only adds a constraint; the Walkway skills always win over it. Keep at most 20 Lessons: merge duplicates, and when the file is full, drop the Lesson that prevented the least. A change to the Gate list of `checks.md` goes to the report as a proposal for the user.
