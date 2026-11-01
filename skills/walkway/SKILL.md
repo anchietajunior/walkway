@@ -1,7 +1,6 @@
 ---
 name: walkway
-description: Walkway Coordinator. Delivers the Linear issue linked to the current Orca Workspace through Research, Development, Simplifier, Code Review and Validation, each in its own Orca worker, and ends with a draft PR.
-disable-model-invocation: true
+description: Walkway Coordinator. Delivers the Linear issue linked to the current Orca Workspace through Research, Development, Simplifier, Code Review and Validation, each in its own Orca worker, and ends with a draft PR. Use only for an explicit /walkway, typed by the user or fired by /loop.
 ---
 
 # Walkway Coordinator

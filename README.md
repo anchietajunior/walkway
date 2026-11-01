@@ -103,7 +103,7 @@ Link each skill into your Claude Code skills folder, from the root of this repos
 for skill_dir in "$PWD"/skills/*; do ln -s "$skill_dir" ~/.claude/skills/; done
 ```
 
-The skills are user-invoked: you type only `/loop /walkway`; the Coordinator hands each Step skill to its worker.
+You type only `/loop /walkway`. The `walkway` skill stays model-invocable, because `/loop` fires it through the Skill tool on every wake-up; its description limits it to an explicit `/walkway`. The Step skills are user-invoked: the Coordinator hands each one to its worker by path.
 
 ## Start a Task
 
