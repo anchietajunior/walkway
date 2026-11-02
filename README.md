@@ -18,7 +18,7 @@ The words used here are defined in [GLOSSARY.md](GLOSSARY.md). The decisions beh
 | 2. Development | Pragmatic senior engineer who hates overengineering; DHH in Rails code | Code that passes the first read and tests that meet every Acceptance Criterion, committed, with green Local Checks |
 | 3. Simplifier | Pragmatic engineer with fresh eyes; Vladimir Dementyev in Rails code | The same behavior with fewer changes and code that reads better, or a reasoned "already simplest" |
 | 4. Code Review | Independent staff engineer | Two review sessions, one per review skill, recording every Finding in one `findings.md` |
-| 5. Validation | Experienced QA engineer | Fresh evidence and screenshots for every Acceptance Criterion in the running application, and a verdict |
+| 5. Validation | Experienced QA engineer | Formal verification of every Acceptance Criterion with metrics, fresh evidence and screenshots in the running application, and a verdict |
 
 ### 1. Research
 
@@ -28,7 +28,7 @@ Then Research reads the Linear issue, its first Source, and every project Source
 
 ### 2. Development
 
-Development implements the Roadmap with the simplest correct change that follows the project's rules. It writes boring code by the [Readability rules](skills/walkway/readability-rules.md), so the next agent or human understands it on the first read: names in the domain's words, entry points that read as named steps, data with named parts, and abstractions only for a concrete need. The Readability rules hold for any language; rules about a language, a framework or a code style, such as comments or type signatures, come from the project's own rules, which win wherever both cover the same point. The Roadmap never prescribes the shape of the code. Every Acceptance Criterion gets a test. In Rails code, Development reasons as DHH: vanilla Rails first, rich models, thin REST controllers and clarity over cleverness, inside the stack the project already uses. In React and GraphQL code, Development builds each component, hook, query, mutation, fragment and schema type the way the project already builds its neighbors.
+Development implements the Roadmap with the simplest correct change that follows the project's rules. It writes boring code by the [Readability rules](skills/walkway/readability-rules.md), so the next agent or human understands it on the first read: names in the domain's words, entry points that read as named steps, data with named parts, and abstractions only for a concrete need. The Readability rules hold for any language; rules about a language, a framework or a code style, such as comments or type signatures, come from the project's own rules, which win wherever both cover the same point. The Roadmap never prescribes the shape of the code. Every Acceptance Criterion gets an example test, and a generated-input test when its property needs one, by the [Property rules](skills/formal-verification/properties.md). In Rails code, Development reasons as DHH: vanilla Rails first, rich models, thin REST controllers and clarity over cleverness, inside the stack the project already uses. In React and GraphQL code, Development builds each component, hook, query, mutation, fragment and schema type the way the project already builds its neighbors.
 
 ### 3. Simplifier
 
@@ -36,11 +36,11 @@ The Simplifier opens a fresh session with the Research context and the Developme
 
 ### 4. Code Review
 
-Each cycle runs two Code Review sessions, one after the other, each with one review skill: Compound Engineering's [`ce-code-review`](https://github.com/EveryInc/compound-engineering-plugin) (reviewer personas for correctness, tests, maintainability and the project's standards, plus security, performance or reliability when the change touches them), then Addy Osmani's [`code-review-and-quality`](https://github.com/addyosmani/agent-skills) (tests first with mutation probes, then correctness, readability, architecture, security and performance). Both record their Findings in the Task's `findings.md`, one table labelled Critical, Required, Optional or Nit, with a Status for each row. A Critical or Required row starts a new cycle: Development fixes it and the Simplifier runs again, with no user involvement.
+Each cycle runs two Code Review sessions, one after the other, each with one review skill: Compound Engineering's [`ce-code-review`](https://github.com/EveryInc/compound-engineering-plugin) (reviewer personas for correctness, tests, maintainability and the project's standards, plus security, performance or reliability when the change touches them), then Addy Osmani's [`code-review-and-quality`](https://github.com/addyosmani/agent-skills) (tests, correctness, readability, architecture, security and performance; Validation measures mutation). Both record their Findings in the Task's `findings.md`, one table labelled Critical, Required, Optional or Nit, with a Status for each row. A Critical or Required row starts a new cycle: Development fixes it and the Simplifier runs again, with no user involvement.
 
 ### 5. Validation
 
-Validation acts as an experienced QA engineer. It proves every Acceptance Criterion again, in the running application, with evidence it produces itself, including a screenshot of everything a customer sees. It confronts the claims of Development and the Findings of Code Review, and records its own Findings in `findings.md`. A failure starts a new cycle the same way.
+Validation acts as an experienced QA engineer. It first verifies the change formally with the [`formal-verification`](skills/formal-verification/SKILL.md) skill: each Acceptance Criterion becomes a written property, its tests are audited and run, every changed line must be reached, mutation probes break the changed code, and TLA+ model checking runs when the change touches concurrency, a state machine, retries, idempotency or money. Every result carries its metric and what it leaves out. Then Validation proves every Acceptance Criterion again, in the running application, with evidence it produces itself, including a screenshot of everything a customer sees. It confronts the claims of Development and the Findings of Code Review, and records its own Findings in `findings.md`. A failure starts a new cycle the same way.
 
 ### Mocks
 
@@ -52,8 +52,8 @@ Some issues carry a Mock: an image of the intended UI. Mock tools lack the appli
 - **The project's rules win.** Every Step follows the rules the project documents: `CLAUDE.md` and `AGENTS.md` at every level, `.claude/rules/`, `CONTRIBUTING.md` and the docs they point to. Where one differs from a Walkway skill on the code, tests, docs, commits or how to run the project, the project rule wins; the Walkway flow stays as the skills say.
 - **Domain words.** Everything Walkway writes, from code to the PR body, names customers, users and every other actor by their role, never as "people".
 - **Tell, don't ask.** Every Step researches the Sources deeply and infers its answers, recording each inference with its evidence. A question with an option the agent would recommend is decided by taking that option and listing it in the final report. Only an Escalation, a question with no safe default that only the user can decide, reaches the user, through the Coordinator, with the options and a recommendation. Code Review and Validation escalate only for a very large ambiguity or risk, and each such Escalation counts as a Research Gap.
-- **Claims are checked, never trusted.** No Step hands off work while the project's tests, linters, type checks or any other CI check fail locally. Development builds `.walkway/checks.md` from the CI configuration on its own, with the local setup the project documents, commands scoped to the Task, bounded parallel tests and a 5-minute ceiling per command; a slower command is treated as a hang. The full suites run in CI on the PR. Validation runs every Local Check again on the reviewed commit, Code Review proves test coverage with mutation probes, and Validation produces its own evidence.
-- **Only Development and the Simplifier change product code and tests.** Research, Code Review and Validation leave the Workspace as they received it, and the Coordinator changes no code.
+- **Claims are checked, never trusted.** No Step hands off work while the project's tests, linters, type checks or any other CI check fail locally. Development builds `.walkway/checks.md` from the CI configuration on its own, with the local setup the project documents, commands scoped to the Task, bounded parallel tests and a 5-minute ceiling per command; a slower command is treated as a hang. The full suites run in CI on the PR. Validation runs every Local Check again on the reviewed commit, verifies the change formally with metrics, and produces its own evidence.
+- **Only Development and the Simplifier change product code and tests.** Research, Code Review and Validation leave the Workspace as they received it, Validation restoring each mutation probe right after it runs, and the Coordinator changes no code.
 - **Evidence travels with the PR.** The PR body follows the project's PR template and adds one short `Evidence` section: one line per Acceptance Criterion with how Validation proved it, one for the Local Checks and one for the cycles run. Screenshots go in only when the Task changes the front end: Validation picks the screenshots of the changed screens, and they go with the Mocks to the `walkway-evidence` branch and into the template's visual section. Without a front-end change, that section says only "No UI change.".
 - **Every Task improves the next.** A retrospective names the root cause of each retry, correction cycle and Escalation. Project causes become Lessons in `.walkway/lessons.md` that every later Step follows; causes in the Walkway skills become proposals in this repository's `improvements.md`, for the user to decide.
 - **The flow runs on messages.** Each worker reports to the Coordinator through Orca with `worker_done`, or asks with `ask`; the Coordinator answers, applies the gate and starts the next worker in the same turn. Its state lives in `coordinator.md` and in Orca, and it runs under `/loop`, so a lost turn resumes from that state until the draft PR or an Escalation.
@@ -77,6 +77,7 @@ Walkway keeps its files in a `.walkway/` folder at the root of the project's mai
     development-<n>.md    One per cycle
     simplifier-<n>.md     One per cycle
     findings.md           Every Finding of the Task, its Status, and the review log
+    verification-<n>.md   Formal verification report, one per cycle
     validation-<n>.md     One per cycle
     evidence/             Validation screenshots and logs
 ```
@@ -94,6 +95,7 @@ Walkway keeps its files in a `.walkway/` folder at the root of the project's mai
   /plugin install compound-engineering@compound-engineering-plugin
   ```
 
+- Java 11 or newer and the TLA+ tools at `~/.local/lib/tla2tools.jar`, from the [TLA+ releases](https://github.com/tlaplus/tlaplus/releases), for model checking. Without them, a Task whose change needs model checking ends in an Escalation.
 - Addy Osmani's agent skills, installed as a Claude Code plugin so the skill keeps its reference checklists:
 
   ```text
@@ -109,7 +111,7 @@ Link each skill into your Claude Code skills folder, from the root of this repos
 for skill_dir in "$PWD"/skills/*; do ln -s "$skill_dir" ~/.claude/skills/; done
 ```
 
-You type only `/loop /walkway`. The `walkway` skill stays model-invocable, because `/loop` fires it through the Skill tool on every wake-up; its description limits it to an explicit `/walkway`. The Step skills are user-invoked: the Coordinator hands each one to its worker by path.
+You type only `/loop /walkway`. The `walkway` skill stays model-invocable, because `/loop` fires it through the Skill tool on every wake-up; its description limits it to an explicit `/walkway`. The Step skills are user-invoked: the Coordinator hands each one to its worker by path. `formal-verification` is model-invocable, so you can also ask Claude to verify any change formally outside Walkway.
 
 ## Start a Task
 

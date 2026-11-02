@@ -135,9 +135,10 @@ Cycle start commit: <HEAD when this cycle's Development started; the base commit
 <Code Review: Review skill: ce-code-review | code-review-and-quality>
 Mock rules: <absolute path to mocks.md, beside this skill>
 Readability rules: <absolute path to readability-rules.md, beside this skill>
+Property rules: <absolute path to properties.md in the formal-verification skill folder, beside this skill's folder>
 Read first: <the input files of this Step and cycle>
 <Development from cycle 2: Fix these Findings: <ID of every blocking row of findings.md>>
-Write: <Task folder>/<step>-<n>.md (Research writes <Task folder>/roadmap.md; Code Review writes <Task folder>/findings.md)
+Write: <Task folder>/<step>-<n>.md (Research writes <Task folder>/roadmap.md; Code Review writes <Task folder>/findings.md; Validation also writes <Task folder>/verification-<n>.md)
 <Previous attempt failed its gate because: <reason>, only on a retry>
 
 Rules:
@@ -150,7 +151,7 @@ Rules:
 - When <Walkway folder>/lessons.md exists, read it first and follow each lesson: a rule this project learned from an earlier Task.
 - <Development and Simplifier: You may change product code and tests in the Workspace. Commit your work before you run the Local Checks.>
 - <Development, Simplifier and Validation: Local Checks. Run every command under ## Gate in <Walkway folder>/checks.md on your final commit, through the environment checks.md describes, and record each command with its exit code and the commit. Run each one in the foreground with a 300000 ms tool timeout. A command still running at 5 minutes is a hang, never a slow test: stop it and every process it started, find the cause, and fix the command in checks.md. Start a test command only when the process list shows no other test run alive on the machine, because test runs share databases and ports. A failure in a file the Task changed closes the gate. A failure elsewhere that passes on one rerun is flaky, and one that also fails on the base commit is a known failure: add it under ## Flaky or ## Known failures in checks.md, and the gate stays open.>
-- <Research, Code Review and Validation: Leave the Workspace exactly as you received it. Write only inside the Task folder and the Walkway folder.>
+- <Research, Code Review and Validation: Leave the Workspace exactly as you received it; Validation's only edits are the mutation probes of `formal-verification`, each restored right after it runs. Write only inside the Task folder and the Walkway folder.>
 - worker_done is your final action, sent as your preamble says: --outcome succeeded when your output file is complete, failed otherwise, with --report-path set to it. Your Step ends only when worker_done is sent.
 ```
 
@@ -174,7 +175,7 @@ Then apply the Step's gate; **Transitions** says what follows a pass or a failur
 | Development | `development-<n>.md` records every Gate command of `checks.md` with exit code 0, flaky or known failure, on the current HEAD; every AC maps to code and a test; `git status --porcelain` is empty |
 | Simplifier | `simplifier-<n>.md` records the Gate commands the same way on the current HEAD, answers both questions, and lists each applied change or explains why there is none; `git status --porcelain` is empty |
 | Code Review, each session | `findings.md` logs the session's review for this cycle, on the current HEAD |
-| Validation | `validation-<n>.md` gives a verdict for the commit both Code Reviews logged, with fresh evidence for every AC; the verdict is PASS and `findings.md` has no blocking row |
+| Validation | `validation-<n>.md` gives a verdict for the commit both Code Reviews logged, with fresh evidence for every AC; `verification-<n>.md` and `validation-<n>.md` both give PASS, and `findings.md` has no blocking row |
 
 Check a worker's record against `git rev-parse HEAD`; the Gate commands themselves always run in workers. Validation runs every one of them again on the reviewed commit, so each code change is checked by two sessions.
 
@@ -197,6 +198,7 @@ When Validation passes:
      ```markdown
      ## Evidence
      - ✅ AC1 <the criterion in a few words>: <how Validation proved it, in a few words>
+     - Verification: <n>/<n> ACs proved, changed lines <covered>/<executable> covered, <killed>/<n> probes killed, Layer 2 <not triggered | <n> states, no violation>
      - Local Checks green on `<short sha>`<; each known failure, with its reason>
      - Walkway: <n> cycles, <n> blocking Findings fixed
      ```

@@ -17,7 +17,7 @@ In React and GraphQL code you build each component, hook, query, mutation, fragm
 - Every line you add follows the project's rules for its file, as the Project rules line of your spec lists them, and the Readability rules file named in your spec. A project rule wins where both cover the same point; the Readability rules decide what the project's rules leave open.
 - Solve the Task with the simplest correct change that fits the surrounding code.
 - The Roadmap fixes what the product does and which area of code changes. The names, the data shapes and the structure of the code are yours: shape them by the Readability rules, even where a Decision or a Plan step suggests a name or a shape.
-- Tests live in the project's test framework and folder. Each AC gets a test that proves it; a bug fix starts with a test that reproduces the bug.
+- Tests live in the project's test framework and folder. Each AC gets an example test, and a generated-input test when its property needs one, written by the Property rules file named in your spec; a bug fix starts with a test that reproduces the bug. Add no testing dependency: without a property-based testing library, write the seeded loop the Property rules describe.
 
 ## Local Checks file
 
@@ -33,7 +33,7 @@ In React and GraphQL code you build each component, hook, query, mutation, fragm
 
 ## Steps
 
-1. Read the Roadmap, the Product Context, the project's rules and the Readability rules. When the Roadmap lists a Mock, also read the Mock rules file named in your spec. From cycle 2, read the rows of `findings.md` your spec names, and `validation-<n-1>.md` when it exists; the code already carries the earlier work.
+1. Read the Roadmap, the Product Context, the project's rules, the Readability rules and the Property rules. When the Roadmap lists a Mock, also read the Mock rules file named in your spec. From cycle 2, read the rows of `findings.md` your spec names, and `validation-<n-1>.md` when it exists; the code already carries the earlier work.
 2. Implement the Plan step by step, writing the test for each AC with the code it covers.
 3. From cycle 2, handle every row your spec names: fix it, or reject it with evidence when the Finding is wrong.
 4. **First read.** Read your diff since the cycle start commit as a reviewer who never saw the Task, method by method, against the project's rules and every Readability rule. Rewrite each method that breaks a rule or fails the first read.
@@ -45,7 +45,7 @@ In React and GraphQL code you build each component, hook, query, mutation, fragm
    # Development <cycle>
 
    ## Acceptance Criteria
-   - AC1: <code paths> - test: <test file and name>
+   - AC1: <code paths> - example test: <test file and name> - generated-input test: <test file and name | not needed: reason>
 
    ## Decisions
    - <inferred decision>: <evidence>
@@ -61,4 +61,4 @@ In React and GraphQL code you build each component, hook, query, mutation, fragm
    - <sha> <subject>
    ```
 
-Done when every AC maps to code and a passing test, every changed method follows the project's rules and passes the first read under the Readability rules, every row your spec names is `fixed` or `rejected` with evidence, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.
+Done when every AC maps to code and its passing tests, every changed method follows the project's rules and passes the first read under the Readability rules, every row your spec names is `fixed` or `rejected` with evidence, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.
