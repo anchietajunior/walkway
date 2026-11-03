@@ -1,5 +1,7 @@
 # Walkway
 
+[Português](README.pt-BR.md)
+
 Walkway is a collection of Claude Code skills that delivers one Linear issue through three stages, Planning, Development and Verification, run by six agents. Each agent has one responsibility, one contract and one persona, and runs in its own Claude Code session. The Coordinator starts each agent as an Orca worker, one at a time, follows every agent and document, and ends with a draft PR that carries the evidence. The Coordinator only coordinates: it never changes code, and every build, test and code change runs in an agent. The user takes part only in strategic decisions.
 
 ```text
@@ -10,6 +12,17 @@ Planning -> Development -> Simplifier -> Code Reviewer -> Verification -> draft 
 ```
 
 The words used here are defined in [GLOSSARY.md](GLOSSARY.md). The decisions behind the design are in [docs/adr/](docs/adr/).
+
+## How a Task flows
+
+1. You ask the Grok Bot to start the issue, or run the command in [Start a Task](#start-a-task). Orca creates a Workspace for the issue and starts the Coordinator with `/loop /walkway`.
+2. The Coordinator names the Workspace `<ISSUE-ID> <issue title>`, creates the Task folder `.walkway/tasks/<ISSUE-ID>/` and starts Planning.
+3. Planning reads the issue and the Resources and writes `tech-spec.md`. Its session closes, the Coordinator checks the tech spec, and starts Development.
+4. Development writes the code and the tests, commits, runs the Local Checks and writes `development-1.md`. Then the Simplifier makes the change simpler, and the Code Reviewer runs the two reviews. This is cycle 1.
+5. When `code-review-findings.md` lists a finding, the Coordinator starts a new Development session with that file, and cycle 2 runs Development, Simplifier and Code Reviewer again.
+6. When it lists none, Verification checks the code against the tech spec, as [Verification in detail](#verification-in-detail) describes. A finding in `verification-findings.md` starts a new cycle the same way.
+7. When Verification passes, the Coordinator opens the draft PR, moves the Linear issue to its review state and writes the retrospective.
+8. After each agent, the Coordinator tells you which agent finished, the result and the next agent. You answer only Escalations.
 
 ## Agents
 
@@ -56,11 +69,84 @@ One Code Reviewer session runs two reviews, one after the other: Compound Engine
 
 ### Verification
 
-Verification confronts the tech spec with the code that Development, the Simplifier and the Code Reviewer produced. It reads the reports of those agents only for their answers to its own earlier findings, because they are claims; the tech spec is the truth. It traces every AC, Contract, Decision and changed file between the tech spec and the code, then verifies the change formally with the [`formal-verification`](skills/formal-verification/SKILL.md) skill: each Acceptance Criterion becomes a written property, its tests are audited and run, every changed line must be reached, mutation probes break the changed code, and TLA+ model checking runs when the change touches concurrency, a state machine, retries, idempotency or money. Then it proves every Acceptance Criterion in the running application, with screenshots of everything a customer sees. Each mismatch goes to `verification-findings.md`, which a new Development session receives; with no finding listed, the Coordinator delivers.
+Verification confronts the tech spec with the code that Development, the Simplifier and the Code Reviewer produced. It reads the reports of those agents only for their answers to its own earlier findings, because they are claims; the tech spec is the truth. It traces every AC, Contract, Decision and changed file between the tech spec and the code, then verifies the change formally with the [`formal-verification`](skills/formal-verification/SKILL.md) skill: each Acceptance Criterion becomes a written property, its tests are audited and run, every changed line must be reached, mutation probes break the changed code, and TLA+ model checking runs when the change touches concurrency, a state machine, retries, idempotency or money. Then it proves every Acceptance Criterion in the running application, with screenshots of everything a customer sees. Each mismatch goes to `verification-findings.md`, which a new Development session receives; with no finding listed, the Coordinator delivers. [Verification in detail](#verification-in-detail) explains each check.
 
 ### Mocks
 
 Some issues carry a Mock: an image of the intended UI. Mock tools lack the application's configuration, so Walkway reproduces a Mock as closely as the application's existing front-end rules allow, never pixel for pixel. The Mock decides structure, content and hierarchy; the components, tokens and patterns of the screens already built decide the exact values. Every deviation names the rule that caused it, and Verification compares each screen with its Mock side by side. The rules are in [skills/walkway/mocks.md](skills/walkway/mocks.md).
+
+## Verification in detail
+
+### Why it exists
+
+Tests check the cases someone wrote. A code review reads the code. Neither shows that the code keeps every promise of the tech spec, in every case. Verification starts from the tech spec, treats the code as a claim, and accepts a promise only on evidence it produced itself, on the reviewed commit.
+
+### The checks, in order
+
+```text
+tech-spec.md
+  1. Trace        every AC, Contract and Decision -> the code that implements it
+  2. Properties   every AC -> a rule a machine can check
+  3. Tests        example tests and generated-input tests, run with recorded seeds
+  4. Coverage     every changed line runs in a test
+  5. Mutation     break the code on purpose; a test must fail
+  6. Model        TLA+ model checked by TLC, only for risky behavior
+  7. Application  every AC used as the customer uses it, with screenshots
+  8. Checks       the Local Checks again
+  -> PASS: the Coordinator delivers | FAIL: verification-findings.md goes to a new Development session
+```
+
+1. **Trace the tech spec to the code.** Each AC, Contract and Decision gets the code that implements it, and each changed file gets the Design area that explains it. A promise with no code, code that bends a promise, or code that no promise explains is a finding.
+2. **Write a property per AC.** A property is the AC written as a rule a machine can check:
+   - **Given:** the state before, such as "a customer with two open tests";
+   - **When:** the action, such as "the hourly job runs";
+   - **Then:** what the customer observes, such as "one email that lists both tests";
+   - **Invariant:** what stays true before and after, such as "no customer receives an empty email";
+   - **Breaks if:** one code change that would make it false.
+
+   Verification writes the property from the AC's text, never from the code, so a bug in the code cannot leak into the expected result.
+3. **Audit and run the tests.** Each AC needs an example test, with fixed inputs. When its text says always, never, any, every or all, or its input varies, it also needs a generated-input test: a test that builds 100 or more random inputs from a seed and checks the property on each one. Verification runs each generated-input test twice, with two seeds it records, so any failure can be replayed. A missing or weaker test is a finding.
+4. **Measure changed-line coverage.** Every executable line the Task changed must run during the AC tests. A line no test runs is a line no test protects. Verification uses Ruby's own `Coverage` module or the JavaScript test runner's LCOV report, so the project needs no new dependency.
+5. **Probe for mutants.** A mutation probe is a small bug that Verification puts in the changed code on purpose: it negates a condition, moves a boundary from `<` to `<=`, swaps `&&` and `||`, removes a guard, or removes a save, an enqueue or an email delivery. Then it runs the AC tests and restores the file.
+   - A test fails: the probe is **killed**, so the tests catch that bug.
+   - Every test passes: the probe **survived**, so that bug would reach production. It becomes a finding that names the missing test, unless the edit cannot change any behavior (**equivalent**).
+6. **Model check the risky behavior (Layer 2).** Only when the change has steps or actors that can interleave or repeat, and it touches concurrency, a state machine, retries, idempotency or money. The next section explains it.
+7. **Prove each AC in the running application.** Verification starts the application from the Workspace and uses each AC as the customer does: it opens the screen, calls the endpoint or runs the job. It saves a screenshot of every AC a customer sees and tries the edges: empty input, missing permission, a failure, a repeated action.
+8. **Run the Local Checks** again on the reviewed commit.
+
+Checks 2 to 5 are **Layer 1** and run on every Task. Check 6 is **Layer 2**.
+
+### TLA+, PlusCal and TLC
+
+Tests run the real code with the inputs and the order of events that someone chose. Bugs of concurrency and retries hide in an order nobody chose: a job reads a row, a customer cancels, the job writes.
+
+- **TLA+** (Temporal Logic of Actions) is a language, created by Leslie Lamport, that describes a system as states and the steps that move it from one state to the next. Verification writes a small model of the risky behavior, not of the whole application: each actor, such as a request, a job or a retry, is a process, and each database transaction or SQL statement is one step. A comment above each step names the code it models.
+- **PlusCal** is a syntax close to pseudo-code that translates into TLA+. Verification uses it when the behavior reads as an algorithm.
+- **TLC** is the model checker for TLA+. It starts from the initial state, tries every possible order of the steps of every actor within small limits, such as two jobs and three retries, and checks the properties in every state it reaches. When a property breaks, TLC prints a **counterexample**: the exact sequence of steps that leads to the bad state. Verification retells that sequence in the code's words and replays it on the real code. A sequence the real code can follow is a Critical finding.
+- **Java:** TLC is a Java program, shipped in `tla2tools.jar`. Walkway needs Java only for Layer 2.
+
+TLC reports the **distinct states** it checked, the **depth** (the longest sequence of steps) and either no violation or the violated property with its counterexample.
+
+An example from a real Task: an hourly email job checked with one SQL query that a customer had tests to report, and loaded those tests with a second query when it rendered the email. TLC checked 302,816 distinct states and found a sequence of 14 steps in which a test was cancelled between the two queries, so the customer received an empty email. Verification replayed the sequence on the real code and confirmed the bug. The tests and two code reviews had missed it.
+
+TLC proves the model, not the code, and only within the model's limits. The step-to-code comments and the replay on the real code keep the model tied to the code.
+
+### The verdict
+
+Verification gives PASS only when every AC is proved, every AC, Contract and Decision matches the code, every Local Check passes and `verification-findings.md` says `No findings.`. An AC is proved when its property is written, its tests pass, its tests killed at least one probe, its changed lines run, every surviving probe has a disposition and, when Layer 2 ran, the model found no violation.
+
+The PR's Evidence section carries one line with the metrics:
+
+```text
+Verification: 12/12 ACs proved, changed lines 35/35 covered, 26/26 probes killed, Layer 2 302,816 states, no violation
+```
+
+- **ACs proved:** ACs that meet every condition above, of all ACs.
+- **Changed lines covered:** changed executable lines that ran in a test, of all of them.
+- **Probes killed:** probes a test caught, of the probes that are not equivalent. The number gives context; the gate is that no probe survives without a disposition.
+- **Layer 2:** the distinct states TLC checked, or `not triggered`.
+
+The rules are in [skills/formal-verification/](skills/formal-verification/SKILL.md), with [properties.md](skills/formal-verification/properties.md) and [model-checking.md](skills/formal-verification/model-checking.md); the research behind them is in [docs/research/](docs/research/).
 
 ## Limits
 
@@ -128,7 +214,7 @@ Every Walkway file of a project lives in a `.walkway/` folder at the root of the
   /plugin install superpowers-ruby@superpowers-ruby
   ```
 
-- Java 11 or newer and the TLA+ tools at `~/.local/lib/tla2tools.jar`, from the [TLA+ releases](https://github.com/tlaplus/tlaplus/releases), for model checking. Without them, a Task whose change needs model checking ends in an Escalation.
+- Java 11 or newer and the TLA+ tools at `~/.local/lib/tla2tools.jar`, from the [TLA+ releases](https://github.com/tlaplus/tlaplus/releases), for Layer 2. `java -version` must work: with Homebrew's OpenJDK, link it with `sudo ln -sfn /opt/homebrew/opt/openjdk/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk.jdk`. Without them, a Task whose change needs Layer 2 ends in an Escalation.
 - Tools to read the Notion pages listed in `resources.md`, such as a Notion MCP server, when the project keeps its docs there.
 
 ## Install
