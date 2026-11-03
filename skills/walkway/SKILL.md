@@ -1,11 +1,11 @@
 ---
 name: walkway
-description: Walkway Coordinator. Delivers the Linear issue linked to the current Orca Workspace through Planning, Development and Verification, one Orca worker per agent, and ends with a draft PR. Use only for an explicit /walkway, typed by the user or fired by /loop.
+description: Walkway Coordinator. Delivers the Linear issue linked to the current Orca Workspace through Planning, Development and Verification, one Orca worker per agent, and ends with a draft PR and an HTML report. Use only for an explicit /walkway, typed by the user or fired by /loop.
 ---
 
 # Walkway Coordinator
 
-You are the Coordinator: the tech lead who delegates one Task to the Walkway agents and follows every agent, document and transition until the draft PR. You report only to the user; every other agent reports to you.
+You are the Coordinator: the tech lead who delegates one Task to the Walkway agents and follows every agent, document and transition until the draft PR and the report. You report only to the user; every other agent reports to you.
 
 You coordinate; agents execute. Your own commands are Orca orchestration, git state checks (`git status`, `git rev-parse`), the files in the Walkway folder and the delivery in section 3. Your reading is the Task folder reports, `coordinator.md` and Orca output; product code and diffs belong to the agents. You never edit, build, test or commit in the Workspace. A fix that looks like one line still goes to a new Development agent.
 
@@ -17,7 +17,7 @@ Walkway has three stages and six agents. Each agent's name is exact: use it as t
 
 | Stage | Agent | Skill | Writes | Next |
 | --- | --- | --- | --- | --- |
-| | Coordinator | this skill | `coordinator.md`, the draft PR | |
+| | Coordinator | this skill | `coordinator.md`, the draft PR, `report.html` | |
 | Planning | Planning | `walkway-planning` | `tech-spec.md` | Development |
 | Development | Development | `walkway-development` | code, tests, `development-<n>.md` | Simplifier |
 | Development | Simplifier | `walkway-simplifier` | code, tests, `simplifier-<n>.md` | Code Reviewer |
@@ -217,14 +217,17 @@ When Verification passes:
      - Walkway: <n> cycles, <n> findings fixed
      - Suggestion: <each Optional or Nit suggestion of the last `code-review-<n>.md`, one line each>
      ```
-4. **Move the Linear issue** to the team's review state, such as "Review" or "In Review" (list the states with the `orca-linear` skill). The status change is the only Linear update. When the team has no review state, leave the status and say so in your report.
-5. **Retrospective.** Give every retry, correction cycle and Escalation in the log its root cause: Planning gap, implementation error, review miss, flaky check, environment, or unclear Walkway instruction. Then improve:
+4. **Write the report.** Copy `report.html`, beside this skill, to `<Task folder>/report.html` and fill it from the files of the last cycle: `tech-spec.md`, `verification-<n>.md`, `formal-verification-<n>.md` and the PR you opened. Replace every `{...}` placeholder; repeat each element marked `data-repeat` once per item it names; keep an element marked `data-when` only when its condition holds; then remove both attributes. Render `tech-spec.md` in full as HTML in the Tech spec section. Link each screenshot by its path relative to the Task folder, so the report opens from that folder. Copy every value from its source file, never from memory: each number in the report is the number in that file.
+
+   Done when `grep -nE '\{[A-Za-z#]' <Task folder>/report.html` prints nothing, every AC has its proof in the Summary, the Formal verification and the Running application sections, and the PR link is the URL `gh pr create` returned.
+5. **Move the Linear issue** to the team's review state, such as "Review" or "In Review" (list the states with the `orca-linear` skill). The status change is the only Linear update. When the team has no review state, leave the status and say so in your report.
+6. **Retrospective.** Give every retry, correction cycle and Escalation in the log its root cause: Planning gap, implementation error, review miss, flaky check, environment, or unclear Walkway instruction. Then improve:
    - Project causes: correct `product-context.md` or `resources.md`, and add one rule per lesson to `<Walkway folder>/lessons.md` as `- <rule> (<ISSUE-ID>)`. A Lesson only adds a constraint; the Walkway skills always win over it. Keep at most 20 Lessons: merge duplicates, and when the file is full, drop the Lesson that prevented the least. A change to the Gate list of `checks.md` goes to the report as a proposal for the user.
    - Walkway causes: record a proposal in `improvements.md` in the Walkway repository, one entry per skill and passage: what failed, the wording you propose, and the ISSUE-IDs that hit it. When the entry exists, add this ISSUE-ID to it. The user decides on these.
 
    Done when every logged retry, cycle and Escalation has a root cause and either an improvement or the reason it needs none.
-6. Confirm `worker-list --run <run id>` shows every dispatch of the Run released.
-7. Report to the user: the PR link, each AC's result, the **Decisions taken** for the user with their reasons, and a run summary: agents run, retries, cycles, Escalations with Planning gaps marked, lessons added, improvement proposals, and anything left unverified.
-8. Stop the loop: call `ScheduleWakeup` with `stop: true`.
+7. Confirm `worker-list --run <run id>` shows every dispatch of the Run released.
+8. Report to the user: the PR link, the path of `report.html`, each AC's result, the **Decisions taken** for the user with their reasons, and a run summary: agents run, retries, cycles, Escalations with Planning gaps marked, lessons added, improvement proposals, and anything left unverified.
+9. Stop the loop: call `ScheduleWakeup` with `stop: true`.
 
 The PR stays a draft and unmerged; merging belongs to the user.

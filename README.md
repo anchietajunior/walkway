@@ -2,7 +2,7 @@
 
 [Português](README.pt-BR.md)
 
-Walkway is a collection of Claude Code skills that delivers one Linear issue through three stages, Planning, Development and Verification, run by six agents. Each agent has one responsibility, one contract and one persona, and runs in its own Claude Code session. The Coordinator starts each agent as an Orca worker, one at a time, follows every agent and document, and ends with a draft PR that carries the evidence. The Coordinator only coordinates: it never changes code, and every build, test and code change runs in an agent. The user takes part only in strategic decisions.
+Walkway is a collection of Claude Code skills that delivers one Linear issue through three stages, Planning, Development and Verification, run by six agents. Each agent has one responsibility, one contract and one persona, and runs in its own Claude Code session. The Coordinator starts each agent as an Orca worker, one at a time, follows every agent and document, and ends with a draft PR that carries the evidence and an HTML report of the Task. The Coordinator only coordinates: it never changes code, and every build, test and code change runs in an agent. The user takes part only in strategic decisions.
 
 ```text
 Planning -> Development -> Simplifier -> Code Reviewer -> Verification -> draft PR
@@ -21,7 +21,7 @@ The words used here are defined in [GLOSSARY.md](GLOSSARY.md). The decisions beh
 4. Development writes the code and the tests, commits, runs the Local Checks and writes `development-1.md`. Then the Simplifier makes the change simpler, and the Code Reviewer runs the two reviews. This is cycle 1.
 5. When `code-review-findings.md` lists a finding, the Coordinator starts a new Development session with that file, and cycle 2 runs Development, Simplifier and Code Reviewer again.
 6. When it lists none, Verification checks the code against the tech spec, as [Verification in detail](#verification-in-detail) describes. A finding in `verification-findings.md` starts a new cycle the same way.
-7. When Verification passes, the Coordinator opens the draft PR, moves the Linear issue to its review state and writes the retrospective.
+7. When Verification passes, the Coordinator opens the draft PR, writes `report.html` (the feature summary, the PR link, the formal verification evidence and the full tech spec), moves the Linear issue to its review state and writes the retrospective.
 8. After each agent, the Coordinator tells you which agent finished, the result and the next agent. You answer only Escalations.
 
 ## Agents
@@ -30,7 +30,7 @@ Every agent is named exactly as below, in Orca and in every Walkway file.
 
 | Stage | Agent | Persona | Outcome | Next |
 | --- | --- | --- | --- | --- |
-| | Coordinator | Tech lead | Every agent started, followed and gated; progress reported to the user; the draft PR | |
+| | Coordinator | Tech lead | Every agent started, followed and gated; progress reported to the user; the draft PR and `report.html` | |
 | Planning | Planning | Product manager and senior engineer | The tech spec: half business, half technology | Development |
 | Development | Development | Pragmatic senior engineer who hates overengineering; DHH in Rails code | Code and tests for the tech spec or the findings, committed, with green Local Checks | Simplifier |
 | Development | Simplifier | Pragmatic engineer with fresh eyes; Vladimir Dementyev in Rails code | The same behavior with fewer changes and code that reads better | Code Reviewer |
@@ -191,6 +191,7 @@ Every Walkway file of a project lives in a `.walkway/` folder at the root of the
     verification-<n>.md       Verdict, spec-to-code trace and application evidence, one per cycle
     verification-findings.md  Open Critical and Required verification findings
     evidence/                 Verification screenshots and logs
+    report.html               Final report: feature summary, PR link, formal verification evidence, tech spec
     tmp/                      Temporary files of any agent
 ```
 

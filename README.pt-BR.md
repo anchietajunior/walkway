@@ -2,7 +2,7 @@
 
 [English](README.md)
 
-Walkway é uma coleção de skills do Claude Code que entrega uma issue do Linear em três estágios, Planning, Development e Verification, executados por seis agentes. Cada agente tem uma responsabilidade, um contrato e uma persona, e roda na sua própria sessão do Claude Code. O Coordinator inicia cada agente como um worker do Orca, um por vez, acompanha cada agente e cada documento, e termina com um draft PR que leva as evidências. O Coordinator só coordena: ele nunca altera código, e todo build, teste e alteração de código roda num agente. O usuário participa só das decisões estratégicas.
+Walkway é uma coleção de skills do Claude Code que entrega uma issue do Linear em três estágios, Planning, Development e Verification, executados por seis agentes. Cada agente tem uma responsabilidade, um contrato e uma persona, e roda na sua própria sessão do Claude Code. O Coordinator inicia cada agente como um worker do Orca, um por vez, acompanha cada agente e cada documento, e termina com um draft PR que leva as evidências e com um relatório HTML da Task. O Coordinator só coordena: ele nunca altera código, e todo build, teste e alteração de código roda num agente. O usuário participa só das decisões estratégicas.
 
 ```text
 Planning -> Development -> Simplifier -> Code Reviewer -> Verification -> draft PR
@@ -21,7 +21,7 @@ Os termos usados aqui estão definidos em [GLOSSARY.md](GLOSSARY.md) (em inglês
 4. O Development escreve o código e os testes, faz o commit, roda os Local Checks e escreve o `development-1.md`. Depois o Simplifier deixa a mudança mais simples, e o Code Reviewer faz os dois reviews. Isso é o ciclo 1.
 5. Quando o `code-review-findings.md` lista um finding, o Coordinator inicia uma nova sessão de Development com esse arquivo, e o ciclo 2 roda Development, Simplifier e Code Reviewer de novo.
 6. Quando ele não lista nenhum, a Verification confere o código contra a tech spec, como descreve [Verification em detalhe](#verification-em-detalhe). Um finding em `verification-findings.md` inicia um novo ciclo da mesma forma.
-7. Quando a Verification passa, o Coordinator abre o draft PR, move a issue do Linear para o estado de review e escreve a retrospectiva.
+7. Quando a Verification passa, o Coordinator abre o draft PR, escreve o `report.html` (resumo da feature, link do PR, evidências da verificação formal e a tech spec completa), move a issue do Linear para o estado de review e escreve a retrospectiva.
 8. Depois de cada agente, o Coordinator diz qual agente terminou, o resultado e o próximo agente. Você responde só às Escalations.
 
 ## Agentes
@@ -30,7 +30,7 @@ Cada agente tem exatamente o nome abaixo, no Orca e em todo arquivo do Walkway.
 
 | Estágio | Agente | Persona | Resultado | Próximo |
 | --- | --- | --- | --- | --- |
-| | Coordinator | Tech lead | Todos os agentes iniciados, acompanhados e verificados; o andamento reportado ao usuário; o draft PR | |
+| | Coordinator | Tech lead | Todos os agentes iniciados, acompanhados e verificados; o andamento reportado ao usuário; o draft PR e o `report.html` | |
 | Planning | Planning | Product manager e engenheiro sênior | A tech spec: metade negócio, metade tecnologia | Development |
 | Development | Development | Engenheiro sênior pragmático que odeia overengineering; DHH em código Rails | Código e testes para a tech spec ou para os findings, com commit e Local Checks verdes | Simplifier |
 | Development | Simplifier | Engenheiro pragmático com olhar novo; Vladimir Dementyev em código Rails | O mesmo comportamento, com menos mudanças e código mais fácil de ler | Code Reviewer |
@@ -191,6 +191,7 @@ Todo arquivo do Walkway de um projeto fica numa pasta `.walkway/` na raiz do che
     verification-<n>.md       Veredito, rastreio spec-código e evidências da aplicação, um por ciclo
     verification-findings.md  Findings Critical e Required abertos da Verification
     evidence/                 Screenshots e logs da Verification
+    report.html               Relatório final: resumo da feature, link do PR, evidências da verificação formal, tech spec
     tmp/                      Arquivos temporários de qualquer agente
 ```
 

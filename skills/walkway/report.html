@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{ISSUE-ID} Walkway report</title>
+<style>
+:root {
+  --bg: #f7f7f5;
+  --surface: #ffffff;
+  --text: #1d1d1b;
+  --muted: #66655f;
+  --border: #e3e2dd;
+  --accent: #2f5bea;
+  --accent-text: #ffffff;
+  --pass: #1a7f37;
+  --pass-bg: #e6f4ea;
+  --fail: #b42318;
+  --fail-bg: #fdecea;
+  --code-bg: #f1f0ec;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141413;
+    --surface: #1d1d1b;
+    --text: #ecebe6;
+    --muted: #a3a29c;
+    --border: #33332f;
+    --accent: #8ea8ff;
+    --accent-text: #141413;
+    --pass: #5cc97b;
+    --pass-bg: #16301e;
+    --fail: #ff8a80;
+    --fail-bg: #3a1a17;
+    --code-bg: #262624;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 960px; margin: 0 auto; padding: 32px 16px 64px; }
+a { color: var(--accent); }
+h1 { font-size: 28px; line-height: 1.25; margin: 4px 0 12px; }
+h2 { font-size: 22px; margin: 48px 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+h3 { font-size: 17px; margin: 28px 0 8px; }
+.eyebrow { color: var(--muted); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; color: var(--muted); font-size: 14px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 20px 0 8px; }
+.button { display: inline-block; padding: 8px 16px; border-radius: 8px; background: var(--accent); color: var(--accent-text); font-weight: 600; text-decoration: none; }
+nav { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; margin-top: 16px; }
+.badge { display: inline-block; padding: 1px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.badge.pass { color: var(--pass); background: var(--pass-bg); }
+.badge.fail { color: var(--fail); background: var(--fail-bg); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.card, details, .spec, .explain { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+.card { padding: 16px; }
+.card .value { font-size: 24px; font-weight: 700; }
+.card .label { color: var(--muted); font-size: 14px; }
+.explain { padding: 4px 20px; font-size: 15px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--surface); }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 600; }
+code { font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+details { padding: 12px 16px; margin: 8px 0; }
+summary { cursor: pointer; font-weight: 600; }
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 12px 0 0; }
+dt { color: var(--muted); }
+dd { margin: 0; }
+figure { margin: 12px 0 20px; }
+figure img { max-width: 100%; border: 1px solid var(--border); border-radius: 8px; }
+figcaption { color: var(--muted); font-size: 14px; }
+.spec { padding: 8px 24px 24px; }
+footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
+@media (max-width: 600px) {
+  h1 { font-size: 24px; }
+  dl { grid-template-columns: 1fr; }
+  .spec { padding: 4px 16px 16px; }
+}
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <div class="eyebrow">Walkway report</div>
+  <h1>{ISSUE-ID} {issue title}</h1>
+  <div class="meta">
+    <span class="badge pass">Verification PASS</span>
+    <span>Commit <code>{short sha}</code></span>
+    <span>{n} cycles, {n} findings fixed</span>
+    <span>{UTC date}</span>
+  </div>
+  <div class="actions">
+    <a class="button" href="{PR URL}">Draft PR #{PR number}</a>
+    <a href="{Linear issue URL}">Linear issue</a>
+  </div>
+  <nav>
+    <a href="#summary">Summary</a>
+    <a href="#verification">Formal verification</a>
+    <a href="#application">Running application</a>
+    <a href="#tech-spec">Tech spec</a>
+  </nav>
+</header>
+
+<section id="summary">
+  <h2>Summary</h2>
+  <p>{the Goal of the tech spec}</p>
+
+  <h3>What changes for each customer</h3>
+  <ul>
+    <li data-repeat="each line of Customers and flows"><strong>{role}</strong>: {what they do today} → {what they do and observe after this Task}</li>
+  </ul>
+
+  <h3>Acceptance Criteria</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>AC</th><th>Criterion</th><th>Result</th><th>How Verification proved it</th></tr></thead>
+      <tbody>
+        <tr data-repeat="each AC"><td>{AC1}</td><td>{the criterion}</td><td><span class="badge pass">proved</span></td><td>{the proof in a few words}</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="verification">
+  <h2>Formal verification</h2>
+
+  <div class="cards">
+    <div class="card"><div class="value">{n}/{n}</div><div class="label">ACs proved</div></div>
+    <div class="card"><div class="value">{covered}/{executable}</div><div class="label">Changed lines covered by tests</div></div>
+    <div class="card"><div class="value">{killed}/{probes - equivalent}</div><div class="label">Mutation probes killed</div></div>
+    <div class="card"><div class="value">{distinct states | not triggered}</div><div class="label">Layer 2 states checked by TLC</div></div>
+  </div>
+
+  <details class="explain">
+    <summary>How to read this section</summary>
+    <ul>
+      <li><strong>Property:</strong> an AC written as a rule a machine can check: given a state, when an action happens, then the customer observes a result.</li>
+      <li><strong>Generated-input test:</strong> a test that builds many random inputs from a recorded seed and checks the property on each one.</li>
+      <li><strong>Changed lines covered:</strong> changed lines that run during the AC tests. A line no test runs is a line no test protects.</li>
+      <li><strong>Mutation probe:</strong> a small bug put in the code on purpose. Killed means a test caught it; equivalent means the edit cannot change any behavior.</li>
+      <li><strong>Layer 2:</strong> a TLA+ model of the risky behavior. TLC tries every order of its steps and checks the properties in every state it reaches.</li>
+    </ul>
+  </details>
+
+  <h3>Tech spec to code</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Item</th><th>Code that keeps it</th><th>Tests</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr data-repeat="each AC, Contract and Decision of the trace"><td>{AC1 | C1 | D1}</td><td><code>{code path}</code></td><td>{tests | none}</td><td><span class="badge pass">matches</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Out of scope: {respected}. Untraced changes: {none}.</p>
+
+  <h3>Acceptance Criteria, one by one</h3>
+  <details data-repeat="each AC">
+    <summary>{AC1} {the criterion in a few words} <span class="badge pass">proved</span></summary>
+    <dl>
+      <dt>Given</dt><dd>{precondition}</dd>
+      <dt>When</dt><dd>{action}</dd>
+      <dt>Then</dt><dd>{postcondition}</dd>
+      <dt>Invariant</dt><dd>{invariant | none}</dd>
+      <dt>Breaks if</dt><dd>{change}</dd>
+      <dt>Example test</dt><dd><code>{file}</code> “{test name}”: exit 0</dd>
+      <dt>Generated inputs</dt><dd>{runs} runs, seeds <code>{seed}</code> and <code>{seed}</code>, {n} discarded | not needed: {reason}</dd>
+      <dt>Able to fail</dt><dd>killed probe {P1}</dd>
+      <dt>Coverage</dt><dd>{covered}/{executable} changed lines</dd>
+      <dt>Layer 2</dt><dd>{the promise checked | not triggered}</dd>
+      <dt>Confidence</dt><dd>{CONFIDENT}, evidence {executed}: {one line}</dd>
+      <dt>Not covered</dt><dd>{bounds, mocks and environments this proof leaves out}</dd>
+    </dl>
+  </details>
+
+  <h3>Mutation probes</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Probe</th><th>Location</th><th>Edit</th><th>AC</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr data-repeat="each probe"><td>{P1}</td><td><code>{file:line}</code></td><td>{edit}</td><td>{AC1}</td><td>{killed by “test name” | equivalent: reason}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Changed-line coverage</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>File</th><th>Covered</th><th>Excluded</th></tr></thead>
+      <tbody>
+        <tr data-repeat="each changed source file"><td><code>{file}</code></td><td>{covered}/{executable}</td><td>{lines: reason | none}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div data-when="Layer 2 ran">
+    <h3>Layer 2: model checking with TLC</h3>
+    <dl>
+      <dt>Triggers</dt><dd>{each trigger that holds}</dd>
+      <dt>Promise</dt><dd>{the promise in one plain sentence}</dd>
+      <dt>Constants</dt><dd>{actors, retries and values the model uses}</dd>
+      <dt>Properties</dt><dd>{each property checked}</dd>
+      <dt>Result</dt><dd>{distinct states} distinct states, depth {depth}, no violation, in {run time}</dd>
+      <dt>Able to fail</dt><dd>{the broken copy of the model and the violation TLC reported}</dd>
+      <dt>Steps to code</dt><dd>{each model step and the code it models}</dd>
+      <dt>Leaves out</dt><dd>{actors, failures and values the model does not cover}</dd>
+    </dl>
+  </div>
+  <p data-when="Layer 2 did not run">Layer 2 not triggered: {each trigger checked and why it does not hold}.</p>
+
+  <h3>Local Checks</h3>
+  <ul>
+    <li data-repeat="each Local Check"><code>{command}</code>: {exit 0 | flaky | known failure: reason}</li>
+  </ul>
+
+  <div data-when="the report lists gaps">
+    <h3>Gaps</h3>
+    <ul><li data-repeat="each gap">{what could not run}: {why}</li></ul>
+  </div>
+</section>
+
+<section id="application">
+  <h2>Running application</h2>
+  <div data-repeat="each AC">
+    <h3>{AC1} {the criterion in a few words}</h3>
+    <p>{the steps and the evidence that proved it}</p>
+    <figure data-repeat="each screenshot of this AC">
+      <img src="{path relative to the Task folder}" alt="{what the screenshot shows}">
+      <figcaption>{what the screenshot shows}</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="tech-spec">
+  <h2>Tech spec</h2>
+  <div class="spec">
+    {tech-spec.md in full, rendered as HTML}
+  </div>
+</section>
+
+<footer>Written by the Walkway Coordinator from tech-spec.md, verification-{n}.md and formal-verification-{n}.md in this folder.</footer>
+
+</main>
+</body>
+</html>
