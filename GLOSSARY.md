@@ -79,5 +79,5 @@ _Avoid_: Style guide, coding standards
 The role the Agent takes, such as an experienced product manager during Planning.
 
 **Coordinator**:
-The Agent that starts every other Agent, one at a time, checks each outcome against its gate, routes to the Agent the report names, and reports the progress to the user. It never changes the code.
+The Agent that starts every other Agent, one at a time, checks each outcome against its gate, routes to the Agent the report names, and reports the progress to the user. It never writes code or scripts.
 _Avoid_: Orchestrator
