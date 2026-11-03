@@ -94,7 +94,7 @@ The flow moves on agent messages: an agent asks with `ask` and reports with `wor
    ## Escalations
    - <Agent> cycle <n>, message <message id>: <question> / waiting | answered: <answer>
    ```
-5. **Your session's name.** Rename your own tab to `Coordinator` with `ORCA terminal rename --title "Coordinator"`, adding `--terminal <your handle>` when Orca needs it.
+5. **Names.** Name the Workspace as the Orca app names one created from a Linear issue, `<ISSUE-ID> <issue title>`: `ORCA worktree set --worktree current --display-name "<ISSUE-ID> <issue title>" --json`. Then rename your own tab to `Coordinator` with `ORCA terminal rename --title "Coordinator"`, adding `--terminal <your handle>` when Orca needs it.
 
 The project's Local Checks live in `<Walkway folder>/checks.md`. Development builds and maintains that file; you only read it.
 

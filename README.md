@@ -149,7 +149,7 @@ Create an Orca Workspace linked to the Linear issue, with a Claude session that 
 orca worktree create --repo path:"$PWD" --name <ISSUE-ID> --linear-issue <ISSUE-ID> --agent claude --surface terminal --prompt "/loop /walkway"
 ```
 
-You can also create the Workspace in the Orca app and type `/loop /walkway` in its Claude terminal session. `/loop` wakes the Coordinator again if its turn ends before the draft PR. Talk only to the Coordinator; it relays every Escalation.
+You can also create the Workspace in the Orca app and type `/loop /walkway` in its Claude terminal session. `/loop` wakes the Coordinator again if its turn ends before the draft PR. At setup, the Coordinator names the Workspace `<ISSUE-ID> <issue title>`, as the Orca app does, however the Workspace was created. Talk only to the Coordinator; it relays every Escalation.
 
 ## Start from the Grok Bot
 
