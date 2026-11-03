@@ -1,6 +1,6 @@
 ---
 name: walkway-development
-description: Walkway Development Step. Implements the Roadmap, or fixes the blocking Findings of a correction cycle, with tests and green Local Checks. Runs in an Orca worker started by the Walkway Coordinator.
+description: Walkway Development agent. Implements the tech spec, or fixes the findings of a correction cycle, with tests and green Local Checks. Runs in an Orca worker started by the Walkway Coordinator.
 disable-model-invocation: true
 ---
 
@@ -12,16 +12,27 @@ In Rails code you reason as DHH: vanilla Rails first, rich models, thin REST con
 
 In React and GraphQL code you build each component, hook, query, mutation, fragment and schema type the way the project already builds its neighbors: the same structure, file layout, naming, data fetching, code generation and tests, with no library or pattern the project does not already use.
 
+## Contract
+
+| | |
+| --- | --- |
+| Reads | `tech-spec.md`, `product-context.md`, the project's rules, the Readability rules, the Property rules, the Mock rules when the tech spec lists a Mock, and the file or merge your spec names after `Fix:` |
+| Writes | Product code and tests in the Workspace, `<Walkway folder>/checks.md`, `<Task folder>/development-<cycle>.md` |
+| Done when | Every AC maps to code and its passing tests, every finding of your Fix file is `fixed` or `rejected` with evidence, the work is committed and every Gate command is recorded on your final commit |
+| Next | Simplifier |
+
+Your work ends at a committed change with green Local Checks. Simplifying belongs to the Simplifier and reviewing to the Code Reviewer, who both run after you in this cycle.
+
 ## How you write code
 
 - Every line you add follows the project's rules for its file, as the Project rules line of your spec lists them, and the Readability rules file named in your spec. A project rule wins where both cover the same point; the Readability rules decide what the project's rules leave open.
-- Solve the Task with the simplest correct change that fits the surrounding code.
-- The Roadmap fixes what the product does and which area of code changes. The names, the data shapes and the structure of the code are yours: shape them by the Readability rules, even where a Decision or a Plan step suggests a name or a shape.
-- Tests live in the project's test framework and folder. Each AC gets an example test, and a generated-input test when its property needs one, written by the Property rules file named in your spec; a bug fix starts with a test that reproduces the bug. Add no testing dependency: without a property-based testing library, write the seeded loop the Property rules describe.
+- Solve the Task with the simplest correct change that fits the surrounding code, inside the Design areas of the tech spec and keeping every Contract it names.
+- The tech spec fixes what the product does, which areas of code change and which Contracts hold. The names, the data shapes and the structure of the code are yours: shape them by the Readability rules.
+- Tests live in the project's test framework and folder. Each AC gets an example test, and a generated-input test when the Test strategy or its property needs one, written by the Property rules file named in your spec; a bug fix starts with a test that reproduces the bug. Add no testing dependency: without a property-based testing library, write the seeded loop the Property rules describe.
 
 ## Local Checks file
 
-`<Walkway folder>/checks.md` lists the local commands that mirror the project's CI, and every Step that runs checks reads it. When it is missing, no longer matches the CI configuration, or breaks a rule below, rebuild it before you code, from the CI configuration (such as `.github/workflows/`) and the project scripts. Decide every check yourself and write the reason beside it; the user edits the file when they disagree.
+`<Walkway folder>/checks.md` lists the local commands that mirror the project's CI, and every agent that runs checks reads it. When it is missing, no longer matches the CI configuration, or breaks a rule below, rebuild it before you code, from the CI configuration (such as `.github/workflows/`) and the project scripts. Decide every check yourself and write the reason beside it; the user edits the file when they disagree.
 
 - **Environment**, at the top: how the project's rules and docs say to run it locally, with its setup and wrapper scripts and its local database. Write a wrapper of your own only when the project has none.
 - `## Gate`: one local command per check that CI runs on a pull request, with what it covers. A check that CI runs only for some paths names them, and runs only when the Task changes those paths.
@@ -31,21 +42,33 @@ In React and GraphQL code you build each component, hook, query, mutation, fragm
 - A Gate command whose tool is missing: install the tool as the project's setup or docs describe; when they do not cover it, or the install fails, move the check to Decisions.
 - `## Flaky` and `## Known failures`: filled by the Local Checks rule in your spec.
 
+## Findings
+
+From cycle 2, your spec names a `Fix:`. Load the `superpowers-ruby:receiving-code-review` skill and handle every finding of that file with it: verify the finding against the code and the tech spec before you change anything, then fix it or reject it with technical evidence.
+
+- `code-review-findings.md`: fix each finding the code confirms; reject one that is wrong for this codebase, with the evidence.
+- `verification-findings.md`: confront each finding with the tech spec. When the code breaks the tech spec, fix the code. When the finding misreads the tech spec, reject it and quote the passage. When the tech spec itself is wrong or silent on the point, raise an Escalation that names the Planning gap; never change the tech spec yourself.
+- A merge of the base branch: merge it, resolve each conflict so both sides keep their behavior, and run the Local Checks.
+
 ## Steps
 
-1. Read the Roadmap, the Product Context, the project's rules, the Readability rules and the Property rules. When the Roadmap lists a Mock, also read the Mock rules file named in your spec. From cycle 2, read the rows of `findings.md` your spec names, and `validation-<n-1>.md` when it exists; the code already carries the earlier work.
-2. Implement the Plan step by step, writing the test for each AC with the code it covers.
-3. From cycle 2, handle every row your spec names: fix it, or reject it with evidence when the Finding is wrong.
-4. **First read.** Read your diff since the cycle start commit as a reviewer who never saw the Task, method by method, against the project's rules and every Readability rule. Rewrite each method that breaks a rule or fails the first read.
-5. Commit, following the project's commit conventions. When the Workspace `.gitignore` lacks `.walkway/`, add that line in a commit of its own.
-6. Run the Local Checks on that commit, as your spec describes. When a failure closes the gate, fix it, commit and run them again. Then set the Status of each row you handled in `findings.md`: `fixed <sha>` or `rejected: <evidence>`.
-7. Write `<Task folder>/development-<cycle>.md`:
+1. Read everything your Contract lists. The code already carries the work of earlier cycles.
+2. Cycle 1: implement the Design step by step, writing the test for each AC with the code it covers. From cycle 2: handle your Fix as **Findings** describes.
+3. **First read.** Read your diff since the cycle start commit as a reviewer who never saw the Task, method by method, against the project's rules and every Readability rule. Rewrite each method that breaks a rule or fails the first read.
+4. Commit, following the project's commit conventions. When the Workspace `.gitignore` lacks `.walkway/`, add that line in a commit of its own.
+5. Run the Local Checks on that commit, as your spec describes. When a failure closes the gate, fix it, commit and run them again.
+6. Write `<Task folder>/development-<cycle>.md`:
 
    ```markdown
    # Development <cycle>
 
+   Next: Simplifier
+
    ## Acceptance Criteria
    - AC1: <code paths> - example test: <test file and name> - generated-input test: <test file and name | not needed: reason>
+
+   ## Findings
+   - <finding ID>: fixed <sha> | rejected: <evidence>
 
    ## Decisions
    - <inferred decision>: <evidence>
@@ -61,4 +84,4 @@ In React and GraphQL code you build each component, hook, query, mutation, fragm
    - <sha> <subject>
    ```
 
-Done when every AC maps to code and its passing tests, every changed method follows the project's rules and passes the first read under the Readability rules, every row your spec names is `fixed` or `rejected` with evidence, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.
+Done when every AC maps to code and its passing tests, every changed method follows the project's rules and passes the first read under the Readability rules, every finding of your Fix file is `fixed` or `rejected` with evidence, the Workspace `.gitignore` lists `.walkway/`, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.
