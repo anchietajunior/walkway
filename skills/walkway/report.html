@@ -100,6 +100,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
     <a href="#summary">Summary</a>
     <a href="#verification">Formal verification</a>
     <a href="#application">Running application</a>
+    <a href="#suggestions">Suggestions</a>
     <a href="#tech-spec">Tech spec</a>
   </nav>
 </header>
@@ -231,6 +232,15 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
       <figcaption>{what the screenshot shows}</figcaption>
     </figure>
   </div>
+</section>
+
+<section id="suggestions">
+  <h2>Suggestions</h2>
+  <p>Optional and Nit improvements from the last Code Reviewer and Verification runs. None of them blocks the PR; you decide on each.</p>
+  <ul data-when="the last code-review and verification files list suggestions">
+    <li data-repeat="each suggestion"><strong>{Optional | Nit}</strong> <code>{file:line}</code>: {suggestion}</li>
+  </ul>
+  <p data-when="neither file lists a suggestion">No suggestions.</p>
 </section>
 
 <section id="tech-spec">

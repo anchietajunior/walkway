@@ -21,7 +21,7 @@ The words used here are defined in [GLOSSARY.md](GLOSSARY.md). The decisions beh
 4. Development writes the code and the tests, commits, runs the Local Checks and writes `development-1.md`. Then the Simplifier makes the change simpler, and the Code Reviewer runs the two reviews. This is cycle 1.
 5. When `code-review-findings.md` lists a finding, the Coordinator starts a new Development session with that file, and cycle 2 runs Development, Simplifier and Code Reviewer again.
 6. When it lists none, Verification checks the code against the tech spec, as [Verification in detail](#verification-in-detail) describes. A finding in `verification-findings.md` starts a new cycle the same way.
-7. When Verification passes, the Coordinator opens the draft PR, writes `report.html` (the feature summary, the PR link, the formal verification evidence and the full tech spec), moves the Linear issue to its review state and writes the retrospective.
+7. When Verification passes, the Coordinator opens the draft PR, writes `report.html` (the feature summary, the PR link, the formal verification evidence, the suggestions and the full tech spec), moves the Linear issue to its review state and writes the retrospective.
 8. After each agent, the Coordinator tells you which agent finished, the result and the next agent. You answer only Escalations.
 
 ## Agents
@@ -65,7 +65,7 @@ The Simplifier opens a fresh session with the tech spec and the Development chan
 
 ### Code Reviewer
 
-One Code Reviewer session runs two reviews, one after the other: Compound Engineering's [`ce-code-review`](https://github.com/EveryInc/compound-engineering-plugin) (reviewer personas for correctness, tests, maintainability and the project's standards, plus security, performance or reliability when the change touches them), then Superpowers' [`requesting-code-review`](https://github.com/lucianghinda/superpowers-ruby) (code quality, architecture, tests, requirements and production readiness). It runs every persona and reviewer itself, with no subagent. Critical and Required findings go to `code-review-findings.md`, which a new Development session receives; Optional and Nit findings become suggestions in the PR. With no finding listed, the flow goes to Verification.
+One Code Reviewer session runs two reviews, one after the other: Compound Engineering's [`ce-code-review`](https://github.com/EveryInc/compound-engineering-plugin) (reviewer personas for correctness, tests, maintainability and the project's standards, plus security, performance or reliability when the change touches them), then Superpowers' [`requesting-code-review`](https://github.com/lucianghinda/superpowers-ruby) (code quality, architecture, tests, requirements and production readiness). It runs every persona and reviewer itself, with no subagent. Critical and Required findings go to `code-review-findings.md`, which a new Development session receives; Optional and Nit findings become suggestions in `report.html`. With no finding listed, the flow goes to Verification.
 
 ### Verification
 
@@ -164,7 +164,7 @@ Each agent's skill opens with a **Contract**: what it reads, what it writes, whe
 - **Tell, don't ask.** Every agent researches the Resources deeply and infers its answers, recording each inference with its evidence. A question with an option the agent would recommend is decided by taking that option and listing it in the final report. Only an Escalation, a question with no safe default that only the user can decide, reaches the user, through the Coordinator, with the options and a recommendation. Code Reviewer and Verification escalate only for a very large ambiguity or risk, and each such Escalation counts as a Planning gap.
 - **Claims are checked, never trusted.** No agent hands off work while the project's tests, linters, type checks or any other CI check fail locally. Development builds `.walkway/checks.md` from the CI configuration on its own, with commands scoped to the Task, bounded parallel tests and a 5-minute ceiling per command. The full suites run in CI on the PR. Verification runs every Local Check again on the reviewed commit and produces its own evidence.
 - **Only Development and the Simplifier change product code and tests.** Planning, Code Reviewer and Verification leave the Workspace as they received it, Verification restoring each mutation probe right after it runs, and the Coordinator changes no code.
-- **Evidence travels with the PR.** The PR body follows the project's PR template and adds one short `Evidence` section: one line per Acceptance Criterion with how Verification proved it, one for the Local Checks, one for the cycles run, and the Code Reviewer's suggestions. Screenshots go in only when the Task changes the front end: they go with the Mocks to the `walkway-evidence` branch and into the template's visual section. Without a front-end change, that section says only "No UI change.".
+- **Evidence travels with the PR.** The PR body follows the project's PR template and adds one short `Evidence` section: one line per Acceptance Criterion with how Verification proved it, one for the metrics, and one for the Local Checks. The body speaks only about the change and its proof: cycles, findings and suggestions stay in `report.html`. Screenshots go in only when the Task changes the front end: they go with the Mocks to the `walkway-evidence` branch and into the template's visual section. Without a front-end change, that section says only "No UI change.".
 - **Every Task improves the next.** A retrospective names the root cause of each retry, correction cycle and Escalation. Project causes become Lessons in `.walkway/lessons.md` that every later agent follows; causes in the Walkway skills become proposals in this repository's `improvements.md`, for the user to decide.
 - **The flow runs on messages.** Each agent reports to the Coordinator through Orca with `worker_done`, or asks with `ask`; the Coordinator answers, applies the gate and starts the next agent in the same turn. Its state lives in `coordinator.md` and in Orca, and it runs under `/loop`, so a lost turn resumes from that state until the draft PR or an Escalation.
 - **The user merges.** Walkway stops at a draft PR and moves the Linear issue to its review state, with no comment.
@@ -191,7 +191,7 @@ Every Walkway file of a project lives in a `.walkway/` folder at the root of the
     verification-<n>.md       Verdict, spec-to-code trace and application evidence, one per cycle
     verification-findings.md  Open Critical and Required verification findings
     evidence/                 Verification screenshots and logs
-    report.html               Final report: feature summary, PR link, formal verification evidence, tech spec
+    report.html               Final report: feature summary, PR link, formal verification evidence, suggestions, tech spec
     tmp/                      Temporary files of any agent
 ```
 

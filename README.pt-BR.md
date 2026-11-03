@@ -21,7 +21,7 @@ Os termos usados aqui estão definidos em [GLOSSARY.md](GLOSSARY.md) (em inglês
 4. O Development escreve o código e os testes, faz o commit, roda os Local Checks e escreve o `development-1.md`. Depois o Simplifier deixa a mudança mais simples, e o Code Reviewer faz os dois reviews. Isso é o ciclo 1.
 5. Quando o `code-review-findings.md` lista um finding, o Coordinator inicia uma nova sessão de Development com esse arquivo, e o ciclo 2 roda Development, Simplifier e Code Reviewer de novo.
 6. Quando ele não lista nenhum, a Verification confere o código contra a tech spec, como descreve [Verification em detalhe](#verification-em-detalhe). Um finding em `verification-findings.md` inicia um novo ciclo da mesma forma.
-7. Quando a Verification passa, o Coordinator abre o draft PR, escreve o `report.html` (resumo da feature, link do PR, evidências da verificação formal e a tech spec completa), move a issue do Linear para o estado de review e escreve a retrospectiva.
+7. Quando a Verification passa, o Coordinator abre o draft PR, escreve o `report.html` (resumo da feature, link do PR, evidências da verificação formal, sugestões e a tech spec completa), move a issue do Linear para o estado de review e escreve a retrospectiva.
 8. Depois de cada agente, o Coordinator diz qual agente terminou, o resultado e o próximo agente. Você responde só às Escalations.
 
 ## Agentes
@@ -65,7 +65,7 @@ O Simplifier abre uma sessão nova com a tech spec e a mudança do Development, 
 
 ### Code Reviewer
 
-Uma sessão de Code Reviewer faz dois reviews, um depois do outro: o [`ce-code-review`](https://github.com/EveryInc/compound-engineering-plugin) do Compound Engineering (personas de review para correção, testes, manutenção e padrões do projeto, mais segurança, performance ou confiabilidade quando a mudança mexe nisso), e depois o [`requesting-code-review`](https://github.com/lucianghinda/superpowers-ruby) do Superpowers (qualidade de código, arquitetura, testes, requisitos e prontidão para produção). Ele roda cada persona e cada reviewer sozinho, sem subagent. Os findings Critical e Required vão para o `code-review-findings.md`, que uma nova sessão de Development recebe; os findings Optional e Nit viram sugestões no PR. Sem nenhum finding listado, o fluxo segue para a Verification.
+Uma sessão de Code Reviewer faz dois reviews, um depois do outro: o [`ce-code-review`](https://github.com/EveryInc/compound-engineering-plugin) do Compound Engineering (personas de review para correção, testes, manutenção e padrões do projeto, mais segurança, performance ou confiabilidade quando a mudança mexe nisso), e depois o [`requesting-code-review`](https://github.com/lucianghinda/superpowers-ruby) do Superpowers (qualidade de código, arquitetura, testes, requisitos e prontidão para produção). Ele roda cada persona e cada reviewer sozinho, sem subagent. Os findings Critical e Required vão para o `code-review-findings.md`, que uma nova sessão de Development recebe; os findings Optional e Nit viram sugestões no `report.html`. Sem nenhum finding listado, o fluxo segue para a Verification.
 
 ### Verification
 
@@ -164,7 +164,7 @@ A skill de cada agente começa com um **Contract**: o que ele lê, o que ele esc
 - **Afirme, não pergunte.** Cada agente pesquisa a fundo os Resources e deduz as respostas, registrando cada dedução com a sua evidência. Uma pergunta com uma opção que o agente recomendaria é decidida com essa opção e listada no report final. Só uma Escalation, uma pergunta sem um padrão seguro que só o usuário pode decidir, chega ao usuário, pelo Coordinator, com as opções e uma recomendação. O Code Reviewer e a Verification só escalam para uma ambiguidade ou um risco muito grande, e cada Escalation dessas conta como um Planning gap.
 - **Afirmações são conferidas, nunca aceitas.** Nenhum agente entrega trabalho enquanto os testes, linters, type checks ou qualquer outro check de CI do projeto falham localmente. O Development cria o `.walkway/checks.md` a partir da configuração de CI, com comandos limitados à Task, testes paralelos com limite e um teto de 5 minutos por comando. As suítes completas rodam no CI do PR. A Verification roda cada Local Check de novo no commit revisado e produz as suas próprias evidências.
 - **Só o Development e o Simplifier alteram código de produto e testes.** O Planning, o Code Reviewer e a Verification deixam o Workspace como o receberam, a Verification restaurando cada mutação logo depois de rodar, e o Coordinator não altera código.
-- **As evidências vão com o PR.** O corpo do PR segue o template de PR do projeto e acrescenta uma seção curta `Evidence`: uma linha por Acceptance Criterion com como a Verification provou, uma para os Local Checks, uma para os ciclos e as sugestões do Code Reviewer. Os screenshots entram só quando a Task muda o front-end: eles vão com os Mocks para a branch `walkway-evidence` e para a seção visual do template. Sem mudança de front-end, essa seção diz só "No UI change.".
+- **As evidências vão com o PR.** O corpo do PR segue o template de PR do projeto e acrescenta uma seção curta `Evidence`: uma linha por Acceptance Criterion com como a Verification provou, uma para as métricas e uma para os Local Checks. O corpo fala só da mudança e da prova dela: ciclos, findings e sugestões ficam no `report.html`. Os screenshots entram só quando a Task muda o front-end: eles vão com os Mocks para a branch `walkway-evidence` e para a seção visual do template. Sem mudança de front-end, essa seção diz só "No UI change.".
 - **Cada Task melhora a próxima.** Uma retrospectiva nomeia a causa raiz de cada nova execução, ciclo de correção e Escalation. As causas do projeto viram Lessons em `.walkway/lessons.md`, que cada agente seguinte segue; as causas nas skills do Walkway viram propostas no `improvements.md` deste repositório, para o usuário decidir.
 - **O fluxo anda por mensagens.** Cada agente reporta ao Coordinator pelo Orca com `worker_done`, ou pergunta com `ask`; o Coordinator responde, aplica o gate e inicia o próximo agente no mesmo turno. O estado dele fica no `coordinator.md` e no Orca, e ele roda sob `/loop`, então um turno perdido retoma a partir desse estado até o draft PR ou uma Escalation.
 - **O usuário faz o merge.** O Walkway para num draft PR e move a issue do Linear para o estado de review, sem comentário.
@@ -191,7 +191,7 @@ Todo arquivo do Walkway de um projeto fica numa pasta `.walkway/` na raiz do che
     verification-<n>.md       Veredito, rastreio spec-código e evidências da aplicação, um por ciclo
     verification-findings.md  Findings Critical e Required abertos da Verification
     evidence/                 Screenshots e logs da Verification
-    report.html               Relatório final: resumo da feature, link do PR, evidências da verificação formal, tech spec
+    report.html               Relatório final: resumo da feature, link do PR, evidências da verificação formal, sugestões, tech spec
     tmp/                      Arquivos temporários de qualquer agente
 ```
 

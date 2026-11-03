@@ -54,7 +54,7 @@ A Critical or Required problem that the Code Reviewer or Verification lists in i
 _Avoid_: Issue, bug, comment
 
 **Suggestion**:
-An Optional or Nit improvement the Code Reviewer reports. It goes to the PR body and never starts a Cycle.
+An Optional or Nit improvement the Code Reviewer or Verification reports. It goes to `report.html`, never to the PR body, and never starts a Cycle.
 
 **Escalation**:
 A question that no Agent can answer from the Resources and the code, so only the user can decide it. Agents infer every other answer and record it as a decision.

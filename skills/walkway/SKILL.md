@@ -214,10 +214,10 @@ When Verification passes:
      - ✅ AC1 <the criterion in a few words>: <how Verification proved it, in a few words>
      - Verification: <n>/<n> ACs proved, changed lines <covered>/<executable> covered, <killed>/<n> probes killed, Layer 2 <not triggered | <n> states, no violation>
      - Local Checks green on `<short sha>`<; each known failure, with its reason>
-     - Walkway: <n> cycles, <n> findings fixed
-     - Suggestion: <each Optional or Nit suggestion of the last `code-review-<n>.md`, one line each>
      ```
-4. **Write the report.** Copy `report.html`, beside this skill, to `<Task folder>/report.html` and fill it from the files of the last cycle: `tech-spec.md`, `verification-<n>.md`, `formal-verification-<n>.md` and the PR you opened. Replace every `{...}` placeholder; repeat each element marked `data-repeat` once per item it names; keep an element marked `data-when` only when its condition holds; then remove both attributes. Render `tech-spec.md` in full as HTML in the Tech spec section. Link each screenshot by its path relative to the Task folder, so the report opens from that folder. Copy every value from its source file, never from memory: each number in the report is the number in that file.
+
+   The body tells a reviewer about the change and its proof, and nothing about how Walkway made it. Cycles, findings, suggestions, agent runs and Task folder paths go to `report.html` and to your report to the user.
+4. **Write the report.** Copy `report.html`, beside this skill, to `<Task folder>/report.html` and fill it from the files of the last cycle: `tech-spec.md`, `code-review-<n>.md`, `verification-<n>.md`, `formal-verification-<n>.md` and the PR you opened. Replace every `{...}` placeholder; repeat each element marked `data-repeat` once per item it names; keep an element marked `data-when` only when its condition holds; then remove both attributes. Render `tech-spec.md` in full as HTML in the Tech spec section. Link each screenshot by its path relative to the Task folder, so the report opens from that folder. Copy every value from its source file, never from memory: each number in the report is the number in that file.
 
    Done when `grep -nE '\{[A-Za-z#]' <Task folder>/report.html` prints nothing, every AC has its proof in the Summary, the Formal verification and the Running application sections, and the PR link is the URL `gh pr create` returned.
 5. **Move the Linear issue** to the team's review state, such as "Review" or "In Review" (list the states with the `orca-linear` skill). The status change is the only Linear update. When the team has no review state, leave the status and say so in your report.
