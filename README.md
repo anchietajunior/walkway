@@ -21,7 +21,7 @@ The words used here are defined in [GLOSSARY.md](GLOSSARY.md). The decisions beh
 4. Development writes the code and the tests, commits, runs the Local Checks and writes `development-1.md`. Then the Simplifier makes the change simpler, and the Code Reviewer runs the two reviews. This is cycle 1.
 5. When `code-review-findings.md` lists a finding, the Coordinator starts a new Development session with that file, and cycle 2 runs Development, Simplifier and Code Reviewer again.
 6. When it lists none, Verification checks the code against the tech spec, as [Verification in detail](#verification-in-detail) describes. A finding in `verification-findings.md` starts a new cycle the same way.
-7. When Verification passes, the Coordinator opens the draft PR, writes `report.html` (the feature summary, the PR link, the formal verification evidence, the suggestions and the full tech spec), moves the Linear issue to its review state and writes the retrospective.
+7. When Verification passes, the Coordinator opens the draft PR, writes `report.html` in Brazilian Portuguese (the feature summary, how to test it, the PR link, the formal verification evidence, the suggestions and the full tech spec), moves the Linear issue to its review state, writes the retrospective and opens the report in the browser.
 8. After each agent, the Coordinator tells you which agent finished, the result and the next agent. You answer only Escalations.
 
 ## Agents
@@ -191,7 +191,7 @@ Every Walkway file of a project lives in a `.walkway/` folder at the root of the
     verification-<n>.md       Verdict, spec-to-code trace and application evidence, one per cycle
     verification-findings.md  Open Critical and Required verification findings
     evidence/                 Verification screenshots and logs
-    report.html               Final report: feature summary, PR link, formal verification evidence, suggestions, tech spec
+    report.html               Final report in pt-BR: feature summary, how to test, PR link, formal verification evidence, suggestions, tech spec
     tmp/                      Temporary files of any agent
 ```
 

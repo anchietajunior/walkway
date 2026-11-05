@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{ISSUE-ID} Walkway report</title>
+<title>{ISSUE-ID} Relatório do Walkway</title>
 <style>
 :root {
   --bg: #f7f7f5;
@@ -84,32 +84,33 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
 <main>
 
 <header>
-  <div class="eyebrow">Walkway report</div>
+  <div class="eyebrow">Relatório do Walkway</div>
   <h1>{ISSUE-ID} {issue title}</h1>
   <div class="meta">
     <span class="badge pass">Verification PASS</span>
     <span>Commit <code>{short sha}</code></span>
-    <span>{n} cycles, {n} findings fixed</span>
+    <span>{n} ciclos, {n} findings corrigidos</span>
     <span>{UTC date}</span>
   </div>
   <div class="actions">
     <a class="button" href="{PR URL}">Draft PR #{PR number}</a>
-    <a href="{Linear issue URL}">Linear issue</a>
+    <a href="{Linear issue URL}">Issue no Linear</a>
   </div>
   <nav>
-    <a href="#summary">Summary</a>
-    <a href="#verification">Formal verification</a>
-    <a href="#application">Running application</a>
-    <a href="#suggestions">Suggestions</a>
+    <a href="#summary">Resumo</a>
+    <a href="#how-to-test">Como testar?</a>
+    <a href="#verification">Verificação formal</a>
+    <a href="#application">Aplicação rodando</a>
+    <a href="#suggestions">Sugestões</a>
     <a href="#tech-spec">Tech spec</a>
   </nav>
 </header>
 
 <section id="summary">
-  <h2>Summary</h2>
+  <h2>Resumo</h2>
   <p>{the Goal of the tech spec}</p>
 
-  <h3>What changes for each customer</h3>
+  <h3>O que muda para cada customer</h3>
   <ul>
     <li data-repeat="each line of Customers and flows"><strong>{role}</strong>: {what they do today} → {what they do and observe after this Task}</li>
   </ul>
@@ -117,79 +118,98 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
   <h3>Acceptance Criteria</h3>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>AC</th><th>Criterion</th><th>Result</th><th>How Verification proved it</th></tr></thead>
+      <thead><tr><th>AC</th><th>Critério</th><th>Resultado</th><th>Como a Verification provou</th></tr></thead>
       <tbody>
-        <tr data-repeat="each AC"><td>{AC1}</td><td>{the criterion}</td><td><span class="badge pass">proved</span></td><td>{the proof in a few words}</td></tr>
+        <tr data-repeat="each AC"><td>{AC1}</td><td>{the criterion}</td><td><span class="badge pass">provado</span></td><td>{the proof in a few words}</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 
+<section id="how-to-test">
+  <h2>Como testar?</h2>
+  <p>Passos para você testar a feature à mão, na sua máquina.</p>
+
+  <h3>Antes de começar</h3>
+  <ol>
+    <li>Baixe a branch do PR: <code>gh pr checkout {PR number}</code></li>
+    <li data-repeat="each setup step of the Environment in checks.md">{the step, with its command in a code element}</li>
+  </ol>
+
+  <div data-repeat="each AC">
+    <h3>{AC1} {the criterion in a few words}</h3>
+    <ol>
+      <li data-repeat="each step a user takes">{the screen, route, command or job, and the data to use}</li>
+    </ol>
+    <p><strong>Resultado esperado:</strong> {what the user sees when the AC holds}</p>
+  </div>
+</section>
+
 <section id="verification">
-  <h2>Formal verification</h2>
+  <h2>Verificação formal</h2>
 
   <div class="cards">
-    <div class="card"><div class="value">{n}/{n}</div><div class="label">ACs proved</div></div>
-    <div class="card"><div class="value">{covered}/{executable}</div><div class="label">Changed lines covered by tests</div></div>
-    <div class="card"><div class="value">{killed}/{probes - equivalent}</div><div class="label">Mutation probes killed</div></div>
-    <div class="card"><div class="value">{distinct states | not triggered}</div><div class="label">Layer 2 states checked by TLC</div></div>
+    <div class="card"><div class="value">{n}/{n}</div><div class="label">ACs provados</div></div>
+    <div class="card"><div class="value">{covered}/{executable}</div><div class="label">Linhas alteradas cobertas por testes</div></div>
+    <div class="card"><div class="value">{killed}/{probes - equivalent}</div><div class="label">Mutation probes mortos</div></div>
+    <div class="card"><div class="value">{distinct states | not triggered}</div><div class="label">Estados da Layer 2 conferidos pelo TLC</div></div>
   </div>
 
   <details class="explain">
-    <summary>How to read this section</summary>
+    <summary>Como ler esta seção</summary>
     <ul>
-      <li><strong>Property:</strong> an AC written as a rule a machine can check: given a state, when an action happens, then the customer observes a result.</li>
-      <li><strong>Generated-input test:</strong> a test that builds many random inputs from a recorded seed and checks the property on each one.</li>
-      <li><strong>Changed lines covered:</strong> changed lines that run during the AC tests. A line no test runs is a line no test protects.</li>
-      <li><strong>Mutation probe:</strong> a small bug put in the code on purpose. Killed means a test caught it; equivalent means the edit cannot change any behavior.</li>
-      <li><strong>Layer 2:</strong> a TLA+ model of the risky behavior. TLC tries every order of its steps and checks the properties in every state it reaches.</li>
+      <li><strong>Propriedade:</strong> um AC escrito como uma regra que uma máquina consegue conferir: dado um estado, quando uma ação acontece, então o customer vê um resultado.</li>
+      <li><strong>Teste com entradas geradas:</strong> um teste que cria muitas entradas aleatórias a partir de uma seed registrada e confere a propriedade em cada uma.</li>
+      <li><strong>Linhas alteradas cobertas:</strong> linhas alteradas que rodam durante os testes dos ACs. Uma linha que nenhum teste roda é uma linha que nenhum teste protege.</li>
+      <li><strong>Mutation probe:</strong> um pequeno bug colocado de propósito no código. Morto quer dizer que um teste pegou o bug; equivalente quer dizer que a mudança não pode alterar nenhum comportamento.</li>
+      <li><strong>Layer 2:</strong> um modelo TLA+ do comportamento de risco. O TLC tenta todas as ordens dos passos e confere as propriedades em cada estado que alcança.</li>
     </ul>
   </details>
 
-  <h3>Tech spec to code</h3>
+  <h3>Da tech spec ao código</h3>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Item</th><th>Code that keeps it</th><th>Tests</th><th>Result</th></tr></thead>
+      <thead><tr><th>Item</th><th>Código que cumpre</th><th>Testes</th><th>Resultado</th></tr></thead>
       <tbody>
-        <tr data-repeat="each AC, Contract and Decision of the trace"><td>{AC1 | C1 | D1}</td><td><code>{code path}</code></td><td>{tests | none}</td><td><span class="badge pass">matches</span></td></tr>
+        <tr data-repeat="each AC, Contract and Decision of the trace"><td>{AC1 | C1 | D1}</td><td><code>{code path}</code></td><td>{tests | none}</td><td><span class="badge pass">confere</span></td></tr>
       </tbody>
     </table>
   </div>
-  <p>Out of scope: {respected}. Untraced changes: {none}.</p>
+  <p>Fora do escopo: {respected}. Mudanças sem rastreio: {none}.</p>
 
-  <h3>Acceptance Criteria, one by one</h3>
+  <h3>Acceptance Criteria, um por um</h3>
   <details data-repeat="each AC">
-    <summary>{AC1} {the criterion in a few words} <span class="badge pass">proved</span></summary>
+    <summary>{AC1} {the criterion in a few words} <span class="badge pass">provado</span></summary>
     <dl>
-      <dt>Given</dt><dd>{precondition}</dd>
-      <dt>When</dt><dd>{action}</dd>
-      <dt>Then</dt><dd>{postcondition}</dd>
-      <dt>Invariant</dt><dd>{invariant | none}</dd>
-      <dt>Breaks if</dt><dd>{change}</dd>
-      <dt>Example test</dt><dd><code>{file}</code> “{test name}”: exit 0</dd>
-      <dt>Generated inputs</dt><dd>{runs} runs, seeds <code>{seed}</code> and <code>{seed}</code>, {n} discarded | not needed: {reason}</dd>
-      <dt>Able to fail</dt><dd>killed probe {P1}</dd>
-      <dt>Coverage</dt><dd>{covered}/{executable} changed lines</dd>
+      <dt>Dado</dt><dd>{precondition}</dd>
+      <dt>Quando</dt><dd>{action}</dd>
+      <dt>Então</dt><dd>{postcondition}</dd>
+      <dt>Invariante</dt><dd>{invariant | none}</dd>
+      <dt>Quebra se</dt><dd>{change}</dd>
+      <dt>Teste de exemplo</dt><dd><code>{file}</code> “{test name}”: exit 0</dd>
+      <dt>Entradas geradas</dt><dd>{runs} execuções, seeds <code>{seed}</code> e <code>{seed}</code>, {n} descartadas | não precisa: {reason}</dd>
+      <dt>Capaz de falhar</dt><dd>probe {P1} morto</dd>
+      <dt>Cobertura</dt><dd>{covered}/{executable} linhas alteradas</dd>
       <dt>Layer 2</dt><dd>{the promise checked | not triggered}</dd>
-      <dt>Confidence</dt><dd>{CONFIDENT}, evidence {executed}: {one line}</dd>
-      <dt>Not covered</dt><dd>{bounds, mocks and environments this proof leaves out}</dd>
+      <dt>Confiança</dt><dd>{CONFIDENT}, evidência {executed}: {one line}</dd>
+      <dt>Não cobre</dt><dd>{bounds, mocks and environments this proof leaves out}</dd>
     </dl>
   </details>
 
   <h3>Mutation probes</h3>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Probe</th><th>Location</th><th>Edit</th><th>AC</th><th>Result</th></tr></thead>
+      <thead><tr><th>Probe</th><th>Local</th><th>Mudança</th><th>AC</th><th>Resultado</th></tr></thead>
       <tbody>
         <tr data-repeat="each probe"><td>{P1}</td><td><code>{file:line}</code></td><td>{edit}</td><td>{AC1}</td><td>{killed by “test name” | equivalent: reason}</td></tr>
       </tbody>
     </table>
   </div>
 
-  <h3>Changed-line coverage</h3>
+  <h3>Cobertura das linhas alteradas</h3>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>File</th><th>Covered</th><th>Excluded</th></tr></thead>
+      <thead><tr><th>Arquivo</th><th>Cobertas</th><th>Excluídas</th></tr></thead>
       <tbody>
         <tr data-repeat="each changed source file"><td><code>{file}</code></td><td>{covered}/{executable}</td><td>{lines: reason | none}</td></tr>
       </tbody>
@@ -197,19 +217,19 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
   </div>
 
   <div data-when="Layer 2 ran">
-    <h3>Layer 2: model checking with TLC</h3>
+    <h3>Layer 2: verificação de modelo com o TLC</h3>
     <dl>
-      <dt>Triggers</dt><dd>{each trigger that holds}</dd>
-      <dt>Promise</dt><dd>{the promise in one plain sentence}</dd>
-      <dt>Constants</dt><dd>{actors, retries and values the model uses}</dd>
-      <dt>Properties</dt><dd>{each property checked}</dd>
-      <dt>Result</dt><dd>{distinct states} distinct states, depth {depth}, no violation, in {run time}</dd>
-      <dt>Able to fail</dt><dd>{the broken copy of the model and the violation TLC reported}</dd>
-      <dt>Steps to code</dt><dd>{each model step and the code it models}</dd>
-      <dt>Leaves out</dt><dd>{actors, failures and values the model does not cover}</dd>
+      <dt>Gatilhos</dt><dd>{each trigger that holds}</dd>
+      <dt>Promessa</dt><dd>{the promise in one plain sentence}</dd>
+      <dt>Constantes</dt><dd>{actors, retries and values the model uses}</dd>
+      <dt>Propriedades</dt><dd>{each property checked}</dd>
+      <dt>Resultado</dt><dd>{distinct states} estados distintos, profundidade {depth}, nenhuma violação, em {run time}</dd>
+      <dt>Capaz de falhar</dt><dd>{the broken copy of the model and the violation TLC reported}</dd>
+      <dt>Passos no código</dt><dd>{each model step and the code it models}</dd>
+      <dt>Deixa de fora</dt><dd>{actors, failures and values the model does not cover}</dd>
     </dl>
   </div>
-  <p data-when="Layer 2 did not run">Layer 2 not triggered: {each trigger checked and why it does not hold}.</p>
+  <p data-when="Layer 2 did not run">Layer 2 não acionada: {each trigger checked and why it does not hold}.</p>
 
   <h3>Local Checks</h3>
   <ul>
@@ -217,13 +237,13 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
   </ul>
 
   <div data-when="the report lists gaps">
-    <h3>Gaps</h3>
+    <h3>Lacunas</h3>
     <ul><li data-repeat="each gap">{what could not run}: {why}</li></ul>
   </div>
 </section>
 
 <section id="application">
-  <h2>Running application</h2>
+  <h2>Aplicação rodando</h2>
   <div data-repeat="each AC">
     <h3>{AC1} {the criterion in a few words}</h3>
     <p>{the steps and the evidence that proved it}</p>
@@ -235,12 +255,12 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
 </section>
 
 <section id="suggestions">
-  <h2>Suggestions</h2>
-  <p>Optional and Nit improvements from the last Code Reviewer and Verification runs. None of them blocks the PR; you decide on each.</p>
+  <h2>Sugestões</h2>
+  <p>Melhorias Optional e Nit dos últimos Code Reviewer e Verification. Nenhuma delas bloqueia o PR; você decide cada uma.</p>
   <ul data-when="the last code-review and verification files list suggestions">
     <li data-repeat="each suggestion"><strong>{Optional | Nit}</strong> <code>{file:line}</code>: {suggestion}</li>
   </ul>
-  <p data-when="neither file lists a suggestion">No suggestions.</p>
+  <p data-when="neither file lists a suggestion">Nenhuma sugestão.</p>
 </section>
 
 <section id="tech-spec">
@@ -250,7 +270,7 @@ footer { margin-top: 48px; color: var(--muted); font-size: 13px; }
   </div>
 </section>
 
-<footer>Written by the Walkway Coordinator from tech-spec.md, verification-{n}.md and formal-verification-{n}.md in this folder.</footer>
+<footer>Escrito pelo Walkway Coordinator a partir de tech-spec.md, verification-{n}.md e formal-verification-{n}.md desta pasta e do checks.md do projeto.</footer>
 
 </main>
 </body>

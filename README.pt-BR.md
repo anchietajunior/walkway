@@ -21,7 +21,7 @@ Os termos usados aqui estão definidos em [GLOSSARY.md](GLOSSARY.md) (em inglês
 4. O Development escreve o código e os testes, faz o commit, roda os Local Checks e escreve o `development-1.md`. Depois o Simplifier deixa a mudança mais simples, e o Code Reviewer faz os dois reviews. Isso é o ciclo 1.
 5. Quando o `code-review-findings.md` lista um finding, o Coordinator inicia uma nova sessão de Development com esse arquivo, e o ciclo 2 roda Development, Simplifier e Code Reviewer de novo.
 6. Quando ele não lista nenhum, a Verification confere o código contra a tech spec, como descreve [Verification em detalhe](#verification-em-detalhe). Um finding em `verification-findings.md` inicia um novo ciclo da mesma forma.
-7. Quando a Verification passa, o Coordinator abre o draft PR, escreve o `report.html` (resumo da feature, link do PR, evidências da verificação formal, sugestões e a tech spec completa), move a issue do Linear para o estado de review e escreve a retrospectiva.
+7. Quando a Verification passa, o Coordinator abre o draft PR, escreve o `report.html` em pt-BR (resumo da feature, como testar, link do PR, evidências da verificação formal, sugestões e a tech spec completa), move a issue do Linear para o estado de review, escreve a retrospectiva e abre o report no navegador.
 8. Depois de cada agente, o Coordinator diz qual agente terminou, o resultado e o próximo agente. Você responde só às Escalations.
 
 ## Agentes
@@ -191,7 +191,7 @@ Todo arquivo do Walkway de um projeto fica numa pasta `.walkway/` na raiz do che
     verification-<n>.md       Veredito, rastreio spec-código e evidências da aplicação, um por ciclo
     verification-findings.md  Findings Critical e Required abertos da Verification
     evidence/                 Screenshots e logs da Verification
-    report.html               Relatório final: resumo da feature, link do PR, evidências da verificação formal, sugestões, tech spec
+    report.html               Relatório final em pt-BR: resumo da feature, como testar, link do PR, evidências da verificação formal, sugestões, tech spec
     tmp/                      Arquivos temporários de qualquer agente
 ```
 
