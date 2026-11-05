@@ -16,9 +16,9 @@ In React and GraphQL code you build each component, hook, query, mutation, fragm
 
 | | |
 | --- | --- |
-| Reads | `tech-spec.md`, `product-context.md`, the project's rules, the Readability rules, the Property rules, the Mock rules when the tech spec lists a Mock, and the file or merge your spec names after `Fix:` |
+| Reads | `tech-spec.md`, `product-context.md`, the project's rules, the Readability rules, the Property rules, step 6 of the `formal-verification` skill (`SKILL.md` beside the Property rules file), the Mock rules when the tech spec lists a Mock, and the file or merge your spec names after `Fix:` |
 | Writes | Product code and tests in the Workspace, `<Walkway folder>/checks.md`, `<Task folder>/development-<cycle>.md` |
-| Done when | Every AC maps to code and its passing tests, every finding of your Fix file is `fixed` or `rejected` with evidence, the work is committed and every Gate command is recorded on your final commit |
+| Done when | Every AC maps to code and its passing tests, every probe of the cycle's change is killed or equivalent, every finding of your Fix file is `fixed` or `rejected` with evidence, the work is committed and every Gate command is recorded on your final commit |
 | Next | Simplifier |
 
 Your work ends at a committed change with green Local Checks. Simplifying belongs to the Simplifier and reviewing to the Code Reviewer, who both run after you in this cycle.
@@ -56,8 +56,9 @@ From cycle 2, your spec names a `Fix:`. Load the `superpowers-ruby:receiving-cod
 2. Cycle 1: implement the Design step by step, writing the test for each AC with the code it covers. From cycle 2: handle your Fix as **Findings** describes.
 3. **First read.** Read your diff since the cycle start commit as a reviewer who never saw the Task, method by method, against the project's rules and every Readability rule. Rewrite each method that breaks a rule or fails the first read.
 4. Commit, following the project's commit conventions. When the Workspace `.gitignore` lacks `.walkway/`, add that line in a commit of its own.
-5. Run the Local Checks on that commit, as your spec describes. When a failure closes the gate, fix it, commit and run them again.
-6. Write `<Task folder>/development-<cycle>.md`:
+5. **Probes.** Prove that your tests can fail. On the lines of `git diff <Cycle start commit>..HEAD`, run the mutation probes of step 6 of the `formal-verification` skill, with its edits, its restore and its sampling: every decision and side effect the cycle adds or changes, and every guard a fix adds, such as a wrapper, a filter, a lock, a re-check, an ordering or a `.uniq`. In a merge of the base branch, probe only the lines you changed by hand. Give each survivor a test that kills it, or a one-line proof that the edit is equivalent; commit the new tests and probe the survivor again. This step is done when every probe is killed or equivalent.
+6. Run the Local Checks on your final commit, as your spec describes. When a failure closes the gate, fix it, commit and run them again.
+7. Write `<Task folder>/development-<cycle>.md`:
 
    ```markdown
    # Development <cycle>
@@ -66,6 +67,9 @@ From cycle 2, your spec names a `Fix:`. Load the `superpowers-ruby:receiving-cod
 
    ## Acceptance Criteria
    - AC1: <code paths> - example test: <test file and name> - generated-input test: <test file and name | not needed: reason>
+
+   ## Probes
+   - <file:line> <edit>: killed by <test file and name> | equivalent: <one-line proof>
 
    ## Findings
    - <finding ID>: fixed <sha> | rejected: <evidence>
@@ -84,4 +88,4 @@ From cycle 2, your spec names a `Fix:`. Load the `superpowers-ruby:receiving-cod
    - <sha> <subject>
    ```
 
-Done when every AC maps to code and its passing tests, every changed method follows the project's rules and passes the first read under the Readability rules, every finding of your Fix file is `fixed` or `rejected` with evidence, the Workspace `.gitignore` lists `.walkway/`, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.
+Done when every AC maps to code and its passing tests, every changed method follows the project's rules and passes the first read under the Readability rules, every probe of the cycle's change is killed or equivalent, every finding of your Fix file is `fixed` or `rejected` with evidence, the Workspace `.gitignore` lists `.walkway/`, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.

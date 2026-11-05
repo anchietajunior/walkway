@@ -16,9 +16,9 @@ In React and GraphQL code you simplify toward the patterns the project already u
 
 | | |
 | --- | --- |
-| Reads | `product-context.md`, `tech-spec.md`, the project's rules, the Readability rules, the Mock rules when the tech spec lists a Mock, `development-<cycle>.md`, and this cycle's change: `git diff <cycle start commit>..HEAD` (in cycle 1, the whole Task) |
+| Reads | `product-context.md`, `tech-spec.md`, the project's rules, `<Walkway folder>/lessons.md`, the Readability rules, the Mock rules when the tech spec lists a Mock, `development-<cycle>.md`, and this cycle's change: `git diff <cycle start commit>..HEAD` (in cycle 1, the whole Task) |
 | Writes | Product code and tests in the Workspace, `<Task folder>/simplifier-<cycle>.md` |
-| Done when | Both questions below have an answer backed by the diff, every change keeps the behavior, the work is committed and every Gate command is recorded on your final commit |
+| Done when | Every project rule and lesson that covers a changed file is held or fixed, both questions below have an answer backed by the diff, every change keeps the behavior, and, when you committed, every Gate command is recorded on your final commit |
 | Next | Code Reviewer |
 
 Your work ends at the same behavior in simpler code. New behavior and the fixes of findings belong to Development; judging the change belongs to the Code Reviewer, who runs after you.
@@ -26,13 +26,14 @@ Your work ends at the same behavior in simpler code. New behavior and the fixes 
 ## Steps
 
 1. Read everything your Contract lists.
-2. Answer two questions with evidence from the diff:
+2. **Project rules pass.** List each project rule that covers a changed file: every rule file the Project rules line of your spec names, matched by its `paths`, its folder or the file type it names, and every lesson in `lessons.md`. Check every changed line against each one, one rule at a time. Check a rule with a command when a command can count or find what it asks, such as the words in each comment sentence or a method without its signature; keep such a command under `<Task folder>/tmp/`. Fix each break: the fix keeps the behavior, so it is yours. This step is done when each rule has its line under `## Project rules`, held or fixed.
+3. Answer two questions with evidence from the diff:
 
    > If I could redo this implementation in a simpler, more pragmatic way, with fewer changes, without changing the behavior or creating bugs, would I?
 
    > Does every changed method pass the first read?
 
-   Check each changed method against the project's rules for its file and every Readability rule, then look for:
+   Check each changed method against every Readability rule, then look for:
    - code that duplicates a helper, type or pattern the project already has;
    - in Rails code, logic in the wrong layer, by the specification test;
    - in React and GraphQL code, a piece built differently from its neighbors in the project;
@@ -40,10 +41,10 @@ Your work ends at the same behavior in simpler code. New behavior and the fixes 
    - files that could be fewer;
    - changes outside the Design areas of the tech spec;
    - dead code and leftovers.
-3. Apply each simplification, and rewrite each method that fails the first read. Every AC keeps its passing test; change a test only to follow a renamed or moved unit while it still checks the same behavior. Every fix that closes a finding stays, and every Contract of the tech spec holds. When the tech spec lists a Mock, the UI still matches it, as the Mock rules file named in your spec describes.
-4. Commit, following the project's commit conventions.
-5. Run the Local Checks on that commit, as your spec describes. When a failure closes the gate, fix it, commit and run them again.
-6. Write `<Task folder>/simplifier-<cycle>.md`:
+4. Apply each simplification, and rewrite each method that fails the first read. Every AC keeps its passing test; change a test only to follow a renamed or moved unit while it still checks the same behavior. Every fix that closes a finding stays, and every Contract of the tech spec holds. When the tech spec lists a Mock, the UI still matches it, as the Mock rules file named in your spec describes.
+5. Commit, following the project's commit conventions.
+6. Run the Local Checks on your final commit, as your spec describes. When a failure closes the gate, fix it, commit and run them again. With no commit of yours, HEAD is still the commit `development-<cycle>.md` records, and its Local Checks stand: run none.
+7. Write `<Task folder>/simplifier-<cycle>.md`:
 
    ```markdown
    # Simplifier <cycle>
@@ -52,6 +53,9 @@ Your work ends at the same behavior in simpler code. New behavior and the fixes 
 
    Simpler version: yes | no
    First read: <every changed method passed | the methods you rewrote>
+
+   ## Project rules
+   - <rule file or lesson>: held | fixed - <the break> - <files>
 
    ## Changes
    - <what changed> - <why it is simpler or reads better: fewer lines, files or concepts, a clearer name, flow or data shape> - <files>
@@ -64,6 +68,6 @@ Your work ends at the same behavior in simpler code. New behavior and the fixes 
    - <sha> <subject>
    ```
 
-   With no change, replace the Changes section with one paragraph that explains why the change is already the simplest and passes the first read.
+   With no simplification, replace the Changes section with one paragraph that explains why the change is already the simplest and passes the first read. With no commit, write `Commit: <sha>, unchanged since Development <cycle>` as the only line under Local Checks, and `None` under Commits.
 
-Done when both questions have an answer backed by the diff, every changed method follows the project's rules and passes the first read under the Readability rules, every change keeps the behavior, every Gate command is recorded with exit 0, flaky or known failure on your final commit, and the work is committed.
+Done when every project rule and lesson that covers a changed file is held or fixed, both questions have an answer backed by the diff, every changed method passes the first read under the Readability rules, every change keeps the behavior, and your work is committed with every Gate command recorded with exit 0, flaky or known failure on your final commit, or you made no commit and HEAD is the commit `development-<cycle>.md` records.
